@@ -402,6 +402,166 @@ const pressureUnits: Unit[] = [
   },
 ];
 
+// 時間の単位
+const timeUnits: Unit[] = [
+  {
+    id: 'second',
+    name: '秒 (s)',
+    toBase: (v) => v,
+    fromBase: (v) => v,
+  },
+  {
+    id: 'minute',
+    name: '分 (min)',
+    toBase: (v) => v * 60,
+    fromBase: (v) => v / 60,
+  },
+  {
+    id: 'hour',
+    name: '時間 (h)',
+    toBase: (v) => v * 3600,
+    fromBase: (v) => v / 3600,
+  },
+  {
+    id: 'day',
+    name: '日',
+    toBase: (v) => v * 86400,
+    fromBase: (v) => v / 86400,
+  },
+  {
+    id: 'week',
+    name: '週',
+    toBase: (v) => v * 604800,
+    fromBase: (v) => v / 604800,
+  },
+  {
+    id: 'month',
+    name: '月 (30日)',
+    toBase: (v) => v * 2592000,
+    fromBase: (v) => v / 2592000,
+  },
+  {
+    id: 'year',
+    name: '年 (365日)',
+    toBase: (v) => v * 31536000,
+    fromBase: (v) => v / 31536000,
+  },
+  {
+    id: 'millisecond',
+    name: 'ミリ秒 (ms)',
+    toBase: (v) => v / 1000,
+    fromBase: (v) => v * 1000,
+  },
+];
+
+// 角度の単位
+const angleUnits: Unit[] = [
+  {
+    id: 'degree',
+    name: '度 (°)',
+    toBase: (v) => v,
+    fromBase: (v) => v,
+  },
+  {
+    id: 'radian',
+    name: 'ラジアン (rad)',
+    toBase: (v) => v * (180 / Math.PI),
+    fromBase: (v) => v * (Math.PI / 180),
+  },
+  {
+    id: 'gradian',
+    name: 'グラジアン (grad)',
+    toBase: (v) => v * 0.9,
+    fromBase: (v) => v / 0.9,
+  },
+  {
+    id: 'turn',
+    name: '回転 (turn)',
+    toBase: (v) => v * 360,
+    fromBase: (v) => v / 360,
+  },
+  {
+    id: 'arcminute',
+    name: '分 (′)',
+    toBase: (v) => v / 60,
+    fromBase: (v) => v * 60,
+  },
+  {
+    id: 'arcsecond',
+    name: '秒 (″)',
+    toBase: (v) => v / 3600,
+    fromBase: (v) => v * 3600,
+  },
+];
+
+// 周波数の単位
+const frequencyUnits: Unit[] = [
+  {
+    id: 'hertz',
+    name: 'ヘルツ (Hz)',
+    toBase: (v) => v,
+    fromBase: (v) => v,
+  },
+  {
+    id: 'kilohertz',
+    name: 'キロヘルツ (kHz)',
+    toBase: (v) => v * 1000,
+    fromBase: (v) => v / 1000,
+  },
+  {
+    id: 'megahertz',
+    name: 'メガヘルツ (MHz)',
+    toBase: (v) => v * 1000000,
+    fromBase: (v) => v / 1000000,
+  },
+  {
+    id: 'gigahertz',
+    name: 'ギガヘルツ (GHz)',
+    toBase: (v) => v * 1000000000,
+    fromBase: (v) => v / 1000000000,
+  },
+  {
+    id: 'rpm',
+    name: '回転毎分 (rpm)',
+    toBase: (v) => v / 60,
+    fromBase: (v) => v * 60,
+  },
+];
+
+// 燃費の単位
+const fuelEfficiencyUnits: Unit[] = [
+  {
+    id: 'km_per_liter',
+    name: 'キロメートル毎リットル (km/L)',
+    toBase: (v) => v,
+    fromBase: (v) => v,
+  },
+  {
+    id: 'liter_per_100km',
+    name: 'リットル毎100キロメートル (L/100km)',
+    toBase: (v) => v === 0 ? 0 : 100 / v,
+    fromBase: (v) => v === 0 ? 0 : 100 / v,
+  },
+  {
+    id: 'mpg_us',
+    name: 'マイル毎ガロン・米 (MPG US)',
+    toBase: (v) => v * 0.425144,
+    fromBase: (v) => v / 0.425144,
+  },
+  {
+    id: 'mpg_uk',
+    name: 'マイル毎ガロン・英 (MPG UK)',
+    toBase: (v) => v * 0.354006,
+    fromBase: (v) => v / 0.354006,
+  },
+  {
+    id: 'mile_per_liter',
+    name: 'マイル毎リットル (mi/L)',
+    toBase: (v) => v * 1.609344,
+    fromBase: (v) => v / 1.609344,
+  },
+];
+
 // すべてのカテゴリ
 export const categories: UnitCategory[] = [
   {
@@ -448,6 +608,26 @@ export const categories: UnitCategory[] = [
     id: 'pressure',
     name: '圧力',
     units: pressureUnits,
+  },
+  {
+    id: 'time',
+    name: '時間',
+    units: timeUnits,
+  },
+  {
+    id: 'angle',
+    name: '角度',
+    units: angleUnits,
+  },
+  {
+    id: 'frequency',
+    name: '周波数',
+    units: frequencyUnits,
+  },
+  {
+    id: 'fuel_efficiency',
+    name: '燃費',
+    units: fuelEfficiencyUnits,
   },
 ];
 
