@@ -44,22 +44,26 @@ export default function UnitConverter() {
 
   // ダークモード初期化（システム設定を検出）
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const savedDarkMode = localStorage.getItem('unit-toolbox-darkmode');
-      if (savedDarkMode) {
-        setDarkMode(savedDarkMode === 'true');
-      } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        setDarkMode(true);
-      }
-    }
-  }, []);
+    if (typeof window === 'undefined') return;
 
-  // ダークモード変更時にlocalStorageに保存
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('unit-toolbox-darkmode', darkMode.toString());
-    }
-  }, [darkMode]);
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+    // 初期設定
+    setDarkMode(mediaQuery.matches);
+
+    // システム設定の変更を検出
+    const handleChange = (e: MediaQueryListEvent) => {
+      setDarkMode(e.matches);
+    };
+
+    // イベントリスナーを追加
+    mediaQuery.addEventListener('change', handleChange);
+
+    // クリーンアップ
+    return () => {
+      mediaQuery.removeEventListener('change', handleChange);
+    };
+  }, []);
 
   // 履歴とお気に入りの読み込み
   useEffect(() => {
@@ -135,7 +139,6 @@ export default function UnitConverter() {
       addFavorite: { ja: 'お気に入りに追加', en: 'Add to Favorites' },
       copy: { ja: 'コピー', en: 'Copy' },
       share: { ja: '共有', en: 'Share' },
-      darkMode: { ja: 'ダークモード', en: 'Dark Mode' },
       calculator: { ja: '計算モード', en: 'Calculator Mode' },
       compound: { ja: '複合単位入力', en: 'Compound Input' },
       search: { ja: '検索...', en: 'Search...' },
@@ -467,20 +470,6 @@ export default function UnitConverter() {
             }}
           >
             {language === 'ja' ? 'EN' : 'JA'}
-          </button>
-          <button
-            onClick={() => setDarkMode(!darkMode)}
-            style={{
-              padding: '0.5rem 1rem',
-              backgroundColor: colors.bgSecondary,
-              color: colors.text,
-              border: `1px solid ${colors.border}`,
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '0.875rem',
-            }}
-          >
-            {darkMode ? '☀️' : '🌙'}
           </button>
         </div>
       </div>
