@@ -191,12 +191,15 @@ export default function UnitConverter() {
       addFavorite: { ja: 'お気に入りに追加', en: 'Add to Favorites' },
       copy: { ja: 'コピー', en: 'Copy' },
       share: { ja: '共有', en: 'Share' },
-      calculator: { ja: '計算モード', en: 'Calculator Mode' },
-      compound: { ja: '複合単位入力', en: 'Compound Input' },
-      search: { ja: '検索...', en: 'Search...' },
+      calculator: { ja: '🧮 計算してから変換', en: '🧮 Calculate First' },
+      compound: { ja: '📝 まとめて入力', en: '📝 Combined Input' },
+      search: { ja: '単位を検索...', en: 'Search units...' },
+      searchLabel: { ja: '単位の検索', en: 'Search Units' },
       export: { ja: 'エクスポート', en: 'Export' },
       import: { ja: 'インポート', en: 'Import' },
       keyboardHelp: { ja: 'キーボードショートカット', en: 'Keyboard Shortcuts' },
+      calculatorDescription: { ja: '四則演算（+, -, *, /）の計算結果を変換元に設定します', en: 'Calculate (+, -, *, /) and set result as input value' },
+      compoundDescription: { ja: '複数の単位をまとめて入力できます（例: 1時間30分）', en: 'Enter multiple units together (e.g., 1h 30m)' },
     };
     return translations[key]?.[language] || key;
   };
@@ -705,9 +708,12 @@ export default function UnitConverter() {
           borderRadius: '8px',
           border: `2px solid ${colors.borderAccent}`,
         }}>
-          <h3 style={{ marginBottom: '0.75rem', fontSize: '1rem' }}>{t('compound')}</h3>
-          <div style={{ marginBottom: '0.5rem', fontSize: '0.75rem', color: colors.textSecondary }}>
-            {language === 'ja' ? '例: ' : 'Examples: '}
+          <h3 style={{ marginBottom: '0.5rem', fontSize: '1rem' }}>{t('compound')}</h3>
+          <p style={{ marginBottom: '0.75rem', fontSize: '0.875rem', color: colors.textSecondary }}>
+            {t('compoundDescription')}
+          </p>
+          <div style={{ marginBottom: '0.5rem', fontSize: '0.75rem', color: colors.textSecondary, fontWeight: 'bold' }}>
+            {language === 'ja' ? '📌 使用例: ' : '📌 Examples: '}
             {getCompoundInputExamples(selectedCategory.id, language).join(', ')}
           </div>
           <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -755,13 +761,19 @@ export default function UnitConverter() {
           borderRadius: '8px',
           border: `2px solid ${colors.borderAccent}`,
         }}>
-          <h3 style={{ marginBottom: '0.75rem', fontSize: '1rem' }}>{t('calculator')}</h3>
+          <h3 style={{ marginBottom: '0.5rem', fontSize: '1rem' }}>{t('calculator')}</h3>
+          <p style={{ marginBottom: '0.75rem', fontSize: '0.875rem', color: colors.textSecondary }}>
+            {t('calculatorDescription')}
+          </p>
+          <div style={{ marginBottom: '0.5rem', fontSize: '0.75rem', color: colors.textSecondary, fontWeight: 'bold' }}>
+            {language === 'ja' ? '📌 使用例: 10 * 5 + 20, 100 / 3, (20 + 30) * 2' : '📌 Examples: 10 * 5 + 20, 100 / 3, (20 + 30) * 2'}
+          </div>
           <div style={{ display: 'flex', gap: '0.5rem' }}>
             <input
               type="text"
               value={calculatorInput}
               onChange={(e) => setCalculatorInput(e.target.value)}
-              placeholder="例: 10 * 5 + 20"
+              placeholder={language === 'ja' ? '例: 10 * 5 + 20' : 'e.g., 10 * 5 + 20'}
               style={{
                 flex: 1,
                 padding: '0.5rem',
@@ -953,7 +965,19 @@ export default function UnitConverter() {
 
       {/* 単位検索 */}
       <div style={{ marginBottom: '1.5rem' }}>
+        <label
+          htmlFor="unit-search"
+          style={{
+            display: 'block',
+            marginBottom: '0.5rem',
+            fontWeight: 'bold',
+            fontSize: '0.875rem',
+          }}
+        >
+          🔍 {t('searchLabel')}:
+        </label>
         <input
+          id="unit-search"
           type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
