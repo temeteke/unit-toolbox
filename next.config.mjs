@@ -1,3 +1,5 @@
+import withPWA from 'next-pwa';
+
 /** @type {import('next').NextConfig} */
 const isProd = process.env.NODE_ENV === 'production';
 
@@ -14,4 +16,12 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+const config = withPWA({
+  dest: 'public',
+  disable: !isProd, // 開発環境では無効化
+  register: true,
+  skipWaiting: true,
+  buildExcludes: [/middleware-manifest\.json$/],
+})(nextConfig);
+
+export default config;
