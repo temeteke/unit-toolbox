@@ -1,0 +1,24 @@
+{
+  "name": "Unit Toolbox - 単位変換ツール",
+  "short_name": "Unit Toolbox",
+  "description": "異なる単位系（SI、ヤード・ポンド、日本の伝統単位など）をまとめて扱う単位変換ツール",
+  "start_url": "/unit-toolbox/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/unit-toolbox/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/unit-toolbox/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ]
+}

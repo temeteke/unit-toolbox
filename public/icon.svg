@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#000000" rx="64"/>
+  <g fill="#ffffff">
+    <!-- 変換記号のデザイン -->
+    <path d="M 150 180 L 230 180 L 230 160 L 150 160 L 150 140 L 250 140 L 250 200 L 150 200 Z" />
+    <path d="M 150 280 L 250 280 L 250 260 L 150 260 L 150 240 L 270 240 L 270 300 L 150 300 Z" />
+
+    <!-- 矢印 -->
+    <path d="M 300 190 L 360 190 L 360 170 L 380 200 L 360 230 L 360 210 L 300 210 Z" />
+
+    <!-- 単位記号 -->
+    <circle cx="180" cy="350" r="30" fill="none" stroke="#ffffff" stroke-width="8"/>
+    <text x="420" y="180" font-size="60" font-family="Arial, sans-serif" font-weight="bold">m</text>
+    <text x="410" y="360" font-size="60" font-family="Arial, sans-serif" font-weight="bold">km</text>
+  </g>
+</svg>
