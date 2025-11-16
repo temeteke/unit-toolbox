@@ -4,6 +4,7 @@ export interface Unit {
   name: string;
   toBase: (value: number) => number;
   fromBase: (value: number) => number;
+  description?: string;
 }
 
 export interface UnitCategory {
@@ -19,60 +20,70 @@ const lengthUnits: Unit[] = [
     name: 'メートル (m)',
     toBase: (v) => v,
     fromBase: (v) => v,
+    description: 'SI基本単位の一つ。1983年に光が真空中で1/299,792,458秒間に進む距離として定義された。',
   },
   {
     id: 'kilometer',
     name: 'キロメートル (km)',
     toBase: (v) => v * 1000,
     fromBase: (v) => v / 1000,
+    description: '1,000メートル。長距離の測定に使用される。',
   },
   {
     id: 'centimeter',
     name: 'センチメートル (cm)',
     toBase: (v) => v / 100,
     fromBase: (v) => v * 100,
+    description: '1/100メートル。身長や小物の長さ測定に便利。',
   },
   {
     id: 'millimeter',
     name: 'ミリメートル (mm)',
     toBase: (v) => v / 1000,
     fromBase: (v) => v * 1000,
+    description: '1/1000メートル。精密な測定に使用される。',
   },
   {
     id: 'mile',
     name: 'マイル (mi)',
     toBase: (v) => v * 1609.344,
     fromBase: (v) => v / 1609.344,
+    description: 'アメリカやイギリスで使用される距離の単位。1マイル = 1,609.344メートル。',
   },
   {
     id: 'yard',
     name: 'ヤード (yd)',
     toBase: (v) => v * 0.9144,
     fromBase: (v) => v / 0.9144,
+    description: 'ヤード・ポンド法の長さの単位。1ヤード = 3フィート = 0.9144メートル。',
   },
   {
     id: 'foot',
     name: 'フィート (ft)',
     toBase: (v) => v * 0.3048,
     fromBase: (v) => v / 0.3048,
+    description: '人間の足の長さに由来する単位。1フィート = 12インチ = 0.3048メートル。',
   },
   {
     id: 'inch',
     name: 'インチ (in)',
     toBase: (v) => v * 0.0254,
     fromBase: (v) => v / 0.0254,
+    description: '親指の幅に由来する単位。1インチ = 2.54センチメートル。画面サイズなどでよく使われる。',
   },
   {
     id: 'shaku',
     name: '尺',
     toBase: (v) => v * 0.303030303,
     fromBase: (v) => v / 0.303030303,
+    description: '日本の尺貫法の長さの単位。1尺 ≒ 30.303センチメートル。建築や和服で使用される。',
   },
   {
     id: 'sun',
     name: '寸',
     toBase: (v) => v * 0.0303030303,
     fromBase: (v) => v / 0.0303030303,
+    description: '尺の1/10。1寸 ≒ 3.03センチメートル。',
   },
 ];
 

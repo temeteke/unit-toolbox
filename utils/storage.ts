@@ -116,3 +116,64 @@ export function clearFavorites(): void {
     console.error('Failed to clear favorites:', error);
   }
 }
+
+// エクスポート/インポート用の型定義
+export interface ExportData {
+  version: string;
+  exportDate: string;
+  history: ConversionHistory[];
+  favorites: FavoriteUnit[];
+}
+
+// データのエクスポート
+export function exportData(): ExportData {
+  return {
+    version: '1.0',
+    exportDate: new Date().toISOString(),
+    history: getHistory(),
+    favorites: getFavorites(),
+  };
+}
+
+// データのインポート
+export function importData(data: ExportData): { success: boolean; error?: string } {
+  if (typeof window === 'undefined') {
+    return { success: false, error: 'Window is not available' };
+  }
+
+  try {
+    // データの検証
+    if (!data.version || !data.history || !data.favorites) {
+      return { success: false, error: 'Invalid data format' };
+    }
+
+    // 履歴とお気に入りをインポート
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(data.history));
+    localStorage.setItem(FAVORITES_KEY, JSON.stringify(data.favorites));
+
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to import data:', error);
+    return { success: false, error: 'Failed to import data' };
+  }
+}
+
+// JSONファイルとしてダウンロード
+export function downloadAsJSON(data: ExportData, filename: string = 'unit-toolbox-data.json'): void {
+  if (typeof window === 'undefined') return;
+
+  try {
+    const json = JSON.stringify(data, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error('Failed to download JSON:', error);
+  }
+}
