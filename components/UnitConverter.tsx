@@ -16,7 +16,6 @@ import {
   downloadAsJSON,
   ExportData,
 } from '@/utils/storage';
-import { parseCompoundInput, getCompoundInputExamples } from '@/utils/compoundParser';
 
 export default function UnitConverter() {
   // 基本的な状態
@@ -33,11 +32,6 @@ export default function UnitConverter() {
   const [darkMode, setDarkMode] = useState<boolean>(false);
   const [showHistory, setShowHistory] = useState<boolean>(false);
   const [showFavorites, setShowFavorites] = useState<boolean>(false);
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const [compoundMode, setCompoundMode] = useState<boolean>(false);
-  const [compoundInput, setCompoundInput] = useState<string>('');
-  const [calculatorMode, setCalculatorMode] = useState<boolean>(false);
-  const [calculatorInput, setCalculatorInput] = useState<string>('');
 
   // 多言語対応
   const [language, setLanguage] = useState<'ja' | 'en'>('ja');
@@ -169,8 +163,6 @@ export default function UnitConverter() {
       else if (e.key === 'Escape') {
         setShowKeyboardHelp(false);
         setShowUnitDescription(null);
-        setCalculatorMode(false);
-        setCompoundMode(false);
       }
     };
 
@@ -191,26 +183,12 @@ export default function UnitConverter() {
       addFavorite: { ja: 'お気に入りに追加', en: 'Add to Favorites' },
       copy: { ja: 'コピー', en: 'Copy' },
       share: { ja: '共有', en: 'Share' },
-      calculator: { ja: '🧮 計算してから変換', en: '🧮 Calculate First' },
-      compound: { ja: '📝 まとめて入力', en: '📝 Combined Input' },
-      search: { ja: '単位を検索...', en: 'Search units...' },
-      searchLabel: { ja: '単位の検索', en: 'Search Units' },
       export: { ja: 'エクスポート', en: 'Export' },
       import: { ja: 'インポート', en: 'Import' },
       keyboardHelp: { ja: 'キーボードショートカット', en: 'Keyboard Shortcuts' },
-      calculatorDescription: { ja: '四則演算（+, -, *, /）の計算結果を変換元に設定します', en: 'Calculate (+, -, *, /) and set result as input value' },
-      compoundDescription: { ja: '複数の単位をまとめて入力できます（例: 1時間30分）', en: 'Enter multiple units together (e.g., 1h 30m)' },
     };
     return translations[key]?.[language] || key;
   };
-
-  const filteredUnits = useMemo(() => {
-    if (!searchTerm) return selectedCategory.units;
-    return selectedCategory.units.filter(unit =>
-      unit.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      unit.id.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [selectedCategory, searchTerm]);
 
   const handleCategoryChange = (categoryId: string) => {
     const category = categories.find((c) => c.id === categoryId);
@@ -218,7 +196,6 @@ export default function UnitConverter() {
       setSelectedCategory(category);
       setFromUnit(category.units[0]);
       setToUnit(category.units[1] || category.units[0]);
-      setSearchTerm('');
     }
   };
 
@@ -315,35 +292,6 @@ export default function UnitConverter() {
       if (from) setFromUnit(from);
       if (to) setToUnit(to);
       setInputValue(item.inputValue);
-    }
-  };
-
-  const handleCalculatorEval = () => {
-    try {
-      // 安全な評価（evalは使わず、基本的な四則演算のみ）
-      const sanitized = calculatorInput.replace(/[^0-9+\-*/().\s]/g, '');
-      const result = Function('"use strict"; return (' + sanitized + ')')();
-      setInputValue(result.toString());
-      setCalculatorInput('');
-      setCalculatorMode(false);
-    } catch (error) {
-      alert(language === 'ja' ? '計算式が正しくありません' : 'Invalid expression');
-    }
-  };
-
-  const handleCompoundParse = () => {
-    const result = parseCompoundInput(compoundInput, selectedCategory.units);
-    if (result.success && result.totalValue !== undefined) {
-      // 基準単位での値を設定
-      const baseUnit = selectedCategory.units[0];
-      setInputValue(result.totalValue.toString());
-      setFromUnit(baseUnit);
-      setCompoundInput('');
-      setCompoundMode(false);
-    } else {
-      alert(language === 'ja' ?
-        '複合単位の解析に失敗しました。例: 1時間30分' :
-        'Failed to parse compound input. Example: 1h 30m');
     }
   };
 
@@ -528,34 +476,6 @@ export default function UnitConverter() {
             {t('favorites')}
           </button>
           <button
-            onClick={() => setCalculatorMode(!calculatorMode)}
-            style={{
-              padding: '0.5rem 1rem',
-              backgroundColor: colors.button,
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '0.875rem',
-            }}
-          >
-            {t('calculator')}
-          </button>
-          <button
-            onClick={() => setCompoundMode(!compoundMode)}
-            style={{
-              padding: '0.5rem 1rem',
-              backgroundColor: colors.button,
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '0.875rem',
-            }}
-          >
-            {t('compound')}
-          </button>
-          <button
             onClick={handleExport}
             style={{
               padding: '0.5rem 1rem',
@@ -694,111 +614,6 @@ export default function UnitConverter() {
               }}
             >
               {language === 'ja' ? '閉じる' : 'Close'}
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* 複合単位入力モード */}
-      {compoundMode && (
-        <div style={{
-          marginBottom: '1.5rem',
-          padding: '1rem',
-          backgroundColor: colors.bgTertiary,
-          borderRadius: '8px',
-          border: `2px solid ${colors.borderAccent}`,
-        }}>
-          <h3 style={{ marginBottom: '0.5rem', fontSize: '1rem' }}>{t('compound')}</h3>
-          <p style={{ marginBottom: '0.75rem', fontSize: '0.875rem', color: colors.textSecondary }}>
-            {t('compoundDescription')}
-          </p>
-          <div style={{ marginBottom: '0.5rem', fontSize: '0.75rem', color: colors.textSecondary, fontWeight: 'bold' }}>
-            {language === 'ja' ? '📌 使用例: ' : '📌 Examples: '}
-            {getCompoundInputExamples(selectedCategory.id, language).join(', ')}
-          </div>
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <input
-              type="text"
-              value={compoundInput}
-              onChange={(e) => setCompoundInput(e.target.value)}
-              placeholder={language === 'ja' ? '例: 1時間30分' : 'e.g., 1h 30m'}
-              style={{
-                flex: 1,
-                padding: '0.5rem',
-                fontSize: '1rem',
-                borderRadius: '4px',
-                border: `1px solid ${colors.border}`,
-                backgroundColor: colors.bg,
-                color: colors.text,
-              }}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') handleCompoundParse();
-              }}
-            />
-            <button
-              onClick={handleCompoundParse}
-              style={{
-                padding: '0.5rem 1rem',
-                backgroundColor: colors.button,
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-              }}
-            >
-              {language === 'ja' ? '変換' : 'Convert'}
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* 計算モード */}
-      {calculatorMode && (
-        <div style={{
-          marginBottom: '1.5rem',
-          padding: '1rem',
-          backgroundColor: colors.bgTertiary,
-          borderRadius: '8px',
-          border: `2px solid ${colors.borderAccent}`,
-        }}>
-          <h3 style={{ marginBottom: '0.5rem', fontSize: '1rem' }}>{t('calculator')}</h3>
-          <p style={{ marginBottom: '0.75rem', fontSize: '0.875rem', color: colors.textSecondary }}>
-            {t('calculatorDescription')}
-          </p>
-          <div style={{ marginBottom: '0.5rem', fontSize: '0.75rem', color: colors.textSecondary, fontWeight: 'bold' }}>
-            {language === 'ja' ? '📌 使用例: 10 * 5 + 20, 100 / 3, (20 + 30) * 2' : '📌 Examples: 10 * 5 + 20, 100 / 3, (20 + 30) * 2'}
-          </div>
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <input
-              type="text"
-              value={calculatorInput}
-              onChange={(e) => setCalculatorInput(e.target.value)}
-              placeholder={language === 'ja' ? '例: 10 * 5 + 20' : 'e.g., 10 * 5 + 20'}
-              style={{
-                flex: 1,
-                padding: '0.5rem',
-                fontSize: '1rem',
-                borderRadius: '4px',
-                border: `1px solid ${colors.border}`,
-                backgroundColor: colors.bg,
-                color: colors.text,
-              }}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') handleCalculatorEval();
-              }}
-            />
-            <button
-              onClick={handleCalculatorEval}
-              style={{
-                padding: '0.5rem 1rem',
-                backgroundColor: colors.button,
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-              }}
-            >
-              =
             </button>
           </div>
         </div>
@@ -963,37 +778,6 @@ export default function UnitConverter() {
         </select>
       </div>
 
-      {/* 単位検索 */}
-      <div style={{ marginBottom: '1.5rem' }}>
-        <label
-          htmlFor="unit-search"
-          style={{
-            display: 'block',
-            marginBottom: '0.5rem',
-            fontWeight: 'bold',
-            fontSize: '0.875rem',
-          }}
-        >
-          🔍 {t('searchLabel')}:
-        </label>
-        <input
-          id="unit-search"
-          type="text"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder={t('search')}
-          style={{
-            width: '100%',
-            padding: '0.5rem',
-            fontSize: '0.875rem',
-            borderRadius: '4px',
-            border: `1px solid ${colors.border}`,
-            backgroundColor: colors.bg,
-            color: colors.text,
-          }}
-        />
-      </div>
-
       {/* 変換元 */}
       <div style={{ marginBottom: '1.5rem' }}>
         <label
@@ -1037,7 +821,7 @@ export default function UnitConverter() {
                 color: colors.text,
               }}
             >
-              {filteredUnits.map((unit) => (
+              {selectedCategory.units.map((unit) => (
                 <option key={unit.id} value={unit.id}>
                   {unit.name}
                 </option>
@@ -1105,7 +889,7 @@ export default function UnitConverter() {
               color: colors.text,
             }}
           >
-            {filteredUnits.map((unit) => (
+            {selectedCategory.units.map((unit) => (
               <option key={unit.id} value={unit.id}>
                 {unit.name}
               </option>
