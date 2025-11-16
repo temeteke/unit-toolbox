@@ -16,39 +16,6 @@ export default function Home() {
         <section style={{ marginBottom: '2rem' }}>
           <UnitConverter />
         </section>
-
-        <footer style={{ marginTop: '3rem', padding: '1.5rem', backgroundColor: '#f9fafb', borderRadius: '8px' }}>
-          <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>対応カテゴリ</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
-            <div style={{ padding: '0.75rem', backgroundColor: 'white', borderRadius: '4px', border: '1px solid #e5e7eb' }}>
-              ✓ 長さ
-            </div>
-            <div style={{ padding: '0.75rem', backgroundColor: 'white', borderRadius: '4px', border: '1px solid #e5e7eb' }}>
-              ✓ 面積
-            </div>
-            <div style={{ padding: '0.75rem', backgroundColor: 'white', borderRadius: '4px', border: '1px solid #e5e7eb' }}>
-              ✓ 体積
-            </div>
-            <div style={{ padding: '0.75rem', backgroundColor: 'white', borderRadius: '4px', border: '1px solid #e5e7eb' }}>
-              ✓ 質量
-            </div>
-            <div style={{ padding: '0.75rem', backgroundColor: 'white', borderRadius: '4px', border: '1px solid #e5e7eb' }}>
-              ✓ 温度
-            </div>
-            <div style={{ padding: '0.75rem', backgroundColor: 'white', borderRadius: '4px', border: '1px solid #e5e7eb' }}>
-              ✓ 速度
-            </div>
-            <div style={{ padding: '0.75rem', backgroundColor: 'white', borderRadius: '4px', border: '1px solid #e5e7eb' }}>
-              ✓ データ量
-            </div>
-            <div style={{ padding: '0.75rem', backgroundColor: 'white', borderRadius: '4px', border: '1px solid #e5e7eb' }}>
-              ✓ エネルギー
-            </div>
-            <div style={{ padding: '0.75rem', backgroundColor: 'white', borderRadius: '4px', border: '1px solid #e5e7eb' }}>
-              ✓ 圧力
-            </div>
-          </div>
-        </footer>
       </div>
     </main>
   );
