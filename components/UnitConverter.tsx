@@ -11,6 +11,10 @@ import {
   removeFavorite,
   ConversionHistory,
   FavoriteUnit,
+  exportData,
+  importData,
+  downloadAsJSON,
+  ExportData,
 } from '@/utils/storage';
 import { parseCompoundInput, getCompoundInputExamples } from '@/utils/compoundParser';
 
@@ -41,6 +45,10 @@ export default function UnitConverter() {
   // オフライン状態の検出
   const [isOnline, setIsOnline] = useState<boolean>(true);
   const [showOfflineNotice, setShowOfflineNotice] = useState<boolean>(false);
+
+  // 新機能の状態
+  const [showKeyboardHelp, setShowKeyboardHelp] = useState<boolean>(false);
+  const [showUnitDescription, setShowUnitDescription] = useState<string | null>(null);
 
   // ダークモード初期化（システム設定を検出）
   useEffect(() => {
@@ -126,6 +134,50 @@ export default function UnitConverter() {
     }
   }, []);
 
+  // キーボードショートカット
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl/Cmd + H: 履歴表示切替
+      if ((e.ctrlKey || e.metaKey) && e.key === 'h') {
+        e.preventDefault();
+        setShowHistory(prev => !prev);
+      }
+      // Ctrl/Cmd + F: お気に入り表示切替（ブラウザの検索と競合しないように）
+      else if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'F') {
+        e.preventDefault();
+        setShowFavorites(prev => !prev);
+      }
+      // Ctrl/Cmd + K: カテゴリ選択にフォーカス
+      else if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        document.getElementById('category')?.focus();
+      }
+      // Ctrl/Cmd + E: エクスポート
+      else if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
+        e.preventDefault();
+        const data = exportData();
+        downloadAsJSON(data, `unit-toolbox-backup-${new Date().toISOString().split('T')[0]}.json`);
+      }
+      // ?: ショートカットヘルプ表示
+      else if (e.shiftKey && e.key === '?' && !(e.target as HTMLElement).matches('input, textarea')) {
+        e.preventDefault();
+        setShowKeyboardHelp(prev => !prev);
+      }
+      // Esc: モーダル/パネルを閉じる
+      else if (e.key === 'Escape') {
+        setShowKeyboardHelp(false);
+        setShowUnitDescription(null);
+        setCalculatorMode(false);
+        setCompoundMode(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const t = (key: string): string => {
     const translations: Record<string, Record<'ja' | 'en', string>> = {
       category: { ja: 'カテゴリを選択', en: 'Select Category' },
@@ -142,6 +194,9 @@ export default function UnitConverter() {
       calculator: { ja: '計算モード', en: 'Calculator Mode' },
       compound: { ja: '複合単位入力', en: 'Compound Input' },
       search: { ja: '検索...', en: 'Search...' },
+      export: { ja: 'エクスポート', en: 'Export' },
+      import: { ja: 'インポート', en: 'Import' },
+      keyboardHelp: { ja: 'キーボードショートカット', en: 'Keyboard Shortcuts' },
     };
     return translations[key]?.[language] || key;
   };
@@ -287,6 +342,48 @@ export default function UnitConverter() {
         '複合単位の解析に失敗しました。例: 1時間30分' :
         'Failed to parse compound input. Example: 1h 30m');
     }
+  };
+
+  // エクスポート機能
+  const handleExport = () => {
+    const data = exportData();
+    downloadAsJSON(data, `unit-toolbox-backup-${new Date().toISOString().split('T')[0]}.json`);
+    alert(language === 'ja' ? 'データをエクスポートしました！' : 'Data exported!');
+  };
+
+  // インポート機能
+  const handleImport = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'application/json';
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const data = JSON.parse(event.target?.result as string) as ExportData;
+          const result = importData(data);
+
+          if (result.success) {
+            setHistory(getHistory());
+            setFavorites(getFavorites());
+            alert(language === 'ja' ? 'データをインポートしました！' : 'Data imported!');
+          } else {
+            alert(language === 'ja' ?
+              `インポートに失敗しました: ${result.error}` :
+              `Import failed: ${result.error}`);
+          }
+        } catch (error) {
+          alert(language === 'ja' ?
+            'ファイルの読み込みに失敗しました' :
+            'Failed to read file');
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
   };
 
   // スタイル定義
@@ -455,8 +552,51 @@ export default function UnitConverter() {
           >
             {t('compound')}
           </button>
+          <button
+            onClick={handleExport}
+            style={{
+              padding: '0.5rem 1rem',
+              backgroundColor: colors.button,
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '0.875rem',
+            }}
+          >
+            {t('export')}
+          </button>
+          <button
+            onClick={handleImport}
+            style={{
+              padding: '0.5rem 1rem',
+              backgroundColor: colors.button,
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '0.875rem',
+            }}
+          >
+            {t('import')}
+          </button>
         </div>
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          <button
+            onClick={() => setShowKeyboardHelp(!showKeyboardHelp)}
+            style={{
+              padding: '0.5rem 1rem',
+              backgroundColor: colors.bgSecondary,
+              color: colors.text,
+              border: `1px solid ${colors.border}`,
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '0.875rem',
+            }}
+            title={language === 'ja' ? 'キーボードショートカット (?)' : 'Keyboard Shortcuts (?)'}
+          >
+            ?
+          </button>
           <button
             onClick={() => setLanguage(language === 'ja' ? 'en' : 'ja')}
             style={{
@@ -473,6 +613,88 @@ export default function UnitConverter() {
           </button>
         </div>
       </div>
+
+      {/* キーボードショートカットヘルプ */}
+      {showKeyboardHelp && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1001,
+          padding: '1rem',
+        }}
+        onClick={() => setShowKeyboardHelp(false)}
+        >
+          <div
+            style={{
+              backgroundColor: colors.bg,
+              color: colors.text,
+              padding: '2rem',
+              borderRadius: '8px',
+              maxWidth: '600px',
+              width: '100%',
+              maxHeight: '80vh',
+              overflowY: 'auto',
+              border: `2px solid ${colors.borderAccent}`,
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 style={{ marginBottom: '1.5rem', fontSize: '1.25rem', fontWeight: 'bold' }}>
+              {t('keyboardHelp')}
+            </h3>
+            <div style={{ display: 'grid', gap: '0.75rem' }}>
+              {[
+                { keys: language === 'ja' ? 'Ctrl/Cmd + H' : 'Ctrl/Cmd + H', desc: language === 'ja' ? '履歴表示切替' : 'Toggle history' },
+                { keys: language === 'ja' ? 'Ctrl/Cmd + Shift + F' : 'Ctrl/Cmd + Shift + F', desc: language === 'ja' ? 'お気に入り表示切替' : 'Toggle favorites' },
+                { keys: language === 'ja' ? 'Ctrl/Cmd + K' : 'Ctrl/Cmd + K', desc: language === 'ja' ? 'カテゴリ選択にフォーカス' : 'Focus on category' },
+                { keys: language === 'ja' ? 'Ctrl/Cmd + E' : 'Ctrl/Cmd + E', desc: language === 'ja' ? 'データをエクスポート' : 'Export data' },
+                { keys: '?', desc: language === 'ja' ? 'このヘルプを表示' : 'Show this help' },
+                { keys: 'Esc', desc: language === 'ja' ? 'モーダル/パネルを閉じる' : 'Close modals/panels' },
+              ].map((shortcut, index) => (
+                <div
+                  key={index}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    padding: '0.75rem',
+                    backgroundColor: colors.bgSecondary,
+                    borderRadius: '4px',
+                    border: `1px solid ${colors.border}`,
+                  }}
+                >
+                  <span style={{ fontWeight: 'bold', fontFamily: 'monospace' }}>
+                    {shortcut.keys}
+                  </span>
+                  <span style={{ color: colors.textSecondary }}>
+                    {shortcut.desc}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => setShowKeyboardHelp(false)}
+              style={{
+                marginTop: '1.5rem',
+                padding: '0.5rem 1rem',
+                backgroundColor: colors.button,
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                width: '100%',
+              }}
+            >
+              {language === 'ja' ? '閉じる' : 'Close'}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* 複合単位入力モード */}
       {compoundMode && (
@@ -777,27 +999,59 @@ export default function UnitConverter() {
               color: colors.text,
             }}
           />
-          <select
-            value={fromUnit.id}
-            onChange={(e) => handleFromUnitChange(e.target.value)}
-            style={{
-              flex: 1,
-              minWidth: '150px',
-              padding: '0.5rem',
-              fontSize: '1rem',
-              borderRadius: '4px',
-              border: `1px solid ${colors.border}`,
-              backgroundColor: colors.bg,
-              color: colors.text,
-            }}
-          >
-            {filteredUnits.map((unit) => (
-              <option key={unit.id} value={unit.id}>
-                {unit.name}
-              </option>
-            ))}
-          </select>
+          <div style={{ flex: 1, minWidth: '150px', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            <select
+              value={fromUnit.id}
+              onChange={(e) => handleFromUnitChange(e.target.value)}
+              style={{
+                flex: 1,
+                padding: '0.5rem',
+                fontSize: '1rem',
+                borderRadius: '4px',
+                border: `1px solid ${colors.border}`,
+                backgroundColor: colors.bg,
+                color: colors.text,
+              }}
+            >
+              {filteredUnits.map((unit) => (
+                <option key={unit.id} value={unit.id}>
+                  {unit.name}
+                </option>
+              ))}
+            </select>
+            {fromUnit.description && (
+              <button
+                onClick={() => setShowUnitDescription(showUnitDescription === fromUnit.id ? null : fromUnit.id)}
+                style={{
+                  padding: '0.5rem',
+                  backgroundColor: colors.bgSecondary,
+                  color: colors.textAccent,
+                  border: `1px solid ${colors.border}`,
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '0.875rem',
+                  fontWeight: 'bold',
+                }}
+                title={language === 'ja' ? '単位の説明を表示' : 'Show unit description'}
+              >
+                ℹ️
+              </button>
+            )}
+          </div>
         </div>
+        {showUnitDescription === fromUnit.id && fromUnit.description && (
+          <div style={{
+            marginTop: '0.5rem',
+            padding: '0.75rem',
+            backgroundColor: colors.bgTertiary,
+            borderRadius: '4px',
+            border: `1px solid ${colors.borderAccent}`,
+            fontSize: '0.875rem',
+            color: colors.text,
+          }}>
+            {fromUnit.description}
+          </div>
+        )}
       </div>
 
       {/* 変換先 */}
@@ -812,26 +1066,59 @@ export default function UnitConverter() {
         >
           {t('to')}:
         </label>
-        <select
-          id="to-unit"
-          value={toUnit.id}
-          onChange={(e) => handleToUnitChange(e.target.value)}
-          style={{
-            width: '100%',
-            padding: '0.5rem',
-            fontSize: '1rem',
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          <select
+            id="to-unit"
+            value={toUnit.id}
+            onChange={(e) => handleToUnitChange(e.target.value)}
+            style={{
+              flex: 1,
+              padding: '0.5rem',
+              fontSize: '1rem',
+              borderRadius: '4px',
+              border: `1px solid ${colors.border}`,
+              backgroundColor: colors.bg,
+              color: colors.text,
+            }}
+          >
+            {filteredUnits.map((unit) => (
+              <option key={unit.id} value={unit.id}>
+                {unit.name}
+              </option>
+            ))}
+          </select>
+          {toUnit.description && (
+            <button
+              onClick={() => setShowUnitDescription(showUnitDescription === toUnit.id ? null : toUnit.id)}
+              style={{
+                padding: '0.5rem',
+                backgroundColor: colors.bgSecondary,
+                color: colors.textAccent,
+                border: `1px solid ${colors.border}`,
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '0.875rem',
+                fontWeight: 'bold',
+              }}
+              title={language === 'ja' ? '単位の説明を表示' : 'Show unit description'}
+            >
+              ℹ️
+            </button>
+          )}
+        </div>
+        {showUnitDescription === toUnit.id && toUnit.description && (
+          <div style={{
+            marginTop: '0.5rem',
+            padding: '0.75rem',
+            backgroundColor: colors.bgTertiary,
             borderRadius: '4px',
-            border: `1px solid ${colors.border}`,
-            backgroundColor: colors.bg,
+            border: `1px solid ${colors.borderAccent}`,
+            fontSize: '0.875rem',
             color: colors.text,
-          }}
-        >
-          {filteredUnits.map((unit) => (
-            <option key={unit.id} value={unit.id}>
-              {unit.name}
-            </option>
-          ))}
-        </select>
+          }}>
+            {toUnit.description}
+          </div>
+        )}
       </div>
 
       {/* 結果 */}
