@@ -778,7 +778,146 @@ export default function UnitConverter() {
         </select>
       </div>
 
-      {/* 変換元 */}
+      {/* 単位選択：変換元 → 変換先 */}
+      <div style={{ marginBottom: '1.5rem' }}>
+        <label
+          style={{
+            display: 'block',
+            marginBottom: '0.5rem',
+            fontWeight: 'bold',
+          }}
+        >
+          {language === 'ja' ? '変換する単位を選択' : 'Select Units'}:
+        </label>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          {/* 変換元の単位 */}
+          <div style={{ flex: 1, minWidth: '200px', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <div style={{ fontSize: '0.75rem', color: colors.textSecondary, fontWeight: 'bold' }}>
+              {t('from')}
+            </div>
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+              <select
+                value={fromUnit.id}
+                onChange={(e) => handleFromUnitChange(e.target.value)}
+                style={{
+                  flex: 1,
+                  padding: '0.5rem',
+                  fontSize: '1rem',
+                  borderRadius: '4px',
+                  border: `1px solid ${colors.border}`,
+                  backgroundColor: colors.bg,
+                  color: colors.text,
+                }}
+              >
+                {selectedCategory.units.map((unit) => (
+                  <option key={unit.id} value={unit.id}>
+                    {unit.name}
+                  </option>
+                ))}
+              </select>
+              {fromUnit.description && (
+                <button
+                  onClick={() => setShowUnitDescription(showUnitDescription === fromUnit.id ? null : fromUnit.id)}
+                  style={{
+                    padding: '0.5rem',
+                    backgroundColor: colors.bgSecondary,
+                    color: colors.textAccent,
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '0.875rem',
+                    fontWeight: 'bold',
+                  }}
+                  title={language === 'ja' ? '単位の説明を表示' : 'Show unit description'}
+                >
+                  ℹ️
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* 矢印 */}
+          <div style={{ fontSize: '1.5rem', color: colors.textAccent, marginTop: '1.25rem' }}>
+            →
+          </div>
+
+          {/* 変換先の単位 */}
+          <div style={{ flex: 1, minWidth: '200px', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <div style={{ fontSize: '0.75rem', color: colors.textSecondary, fontWeight: 'bold' }}>
+              {t('to')}
+            </div>
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+              <select
+                value={toUnit.id}
+                onChange={(e) => handleToUnitChange(e.target.value)}
+                style={{
+                  flex: 1,
+                  padding: '0.5rem',
+                  fontSize: '1rem',
+                  borderRadius: '4px',
+                  border: `1px solid ${colors.border}`,
+                  backgroundColor: colors.bg,
+                  color: colors.text,
+                }}
+              >
+                {selectedCategory.units.map((unit) => (
+                  <option key={unit.id} value={unit.id}>
+                    {unit.name}
+                  </option>
+                ))}
+              </select>
+              {toUnit.description && (
+                <button
+                  onClick={() => setShowUnitDescription(showUnitDescription === toUnit.id ? null : toUnit.id)}
+                  style={{
+                    padding: '0.5rem',
+                    backgroundColor: colors.bgSecondary,
+                    color: colors.textAccent,
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '0.875rem',
+                    fontWeight: 'bold',
+                  }}
+                  title={language === 'ja' ? '単位の説明を表示' : 'Show unit description'}
+                >
+                  ℹ️
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* 単位の説明 */}
+        {showUnitDescription === fromUnit.id && fromUnit.description && (
+          <div style={{
+            marginTop: '0.75rem',
+            padding: '0.75rem',
+            backgroundColor: colors.bgTertiary,
+            borderRadius: '4px',
+            border: `1px solid ${colors.borderAccent}`,
+            fontSize: '0.875rem',
+            color: colors.text,
+          }}>
+            <strong>{fromUnit.name}:</strong> {fromUnit.description}
+          </div>
+        )}
+        {showUnitDescription === toUnit.id && toUnit.description && (
+          <div style={{
+            marginTop: '0.75rem',
+            padding: '0.75rem',
+            backgroundColor: colors.bgTertiary,
+            borderRadius: '4px',
+            border: `1px solid ${colors.borderAccent}`,
+            fontSize: '0.875rem',
+            color: colors.text,
+          }}>
+            <strong>{toUnit.name}:</strong> {toUnit.description}
+          </div>
+        )}
+      </div>
+
+      {/* 数値入力 */}
       <div style={{ marginBottom: '1.5rem' }}>
         <label
           htmlFor="input-value"
@@ -788,145 +927,24 @@ export default function UnitConverter() {
             fontWeight: 'bold',
           }}
         >
-          {t('from')}:
+          {language === 'ja' ? '数値を入力' : 'Enter Value'}:
         </label>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
-          <input
-            id="input-value"
-            type="number"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            style={{
-              flex: 1,
-              minWidth: '150px',
-              padding: '0.5rem',
-              fontSize: '1rem',
-              borderRadius: '4px',
-              border: `1px solid ${colors.border}`,
-              backgroundColor: colors.bg,
-              color: colors.text,
-            }}
-          />
-          <div style={{ flex: 1, minWidth: '150px', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-            <select
-              value={fromUnit.id}
-              onChange={(e) => handleFromUnitChange(e.target.value)}
-              style={{
-                flex: 1,
-                padding: '0.5rem',
-                fontSize: '1rem',
-                borderRadius: '4px',
-                border: `1px solid ${colors.border}`,
-                backgroundColor: colors.bg,
-                color: colors.text,
-              }}
-            >
-              {selectedCategory.units.map((unit) => (
-                <option key={unit.id} value={unit.id}>
-                  {unit.name}
-                </option>
-              ))}
-            </select>
-            {fromUnit.description && (
-              <button
-                onClick={() => setShowUnitDescription(showUnitDescription === fromUnit.id ? null : fromUnit.id)}
-                style={{
-                  padding: '0.5rem',
-                  backgroundColor: colors.bgSecondary,
-                  color: colors.textAccent,
-                  border: `1px solid ${colors.border}`,
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '0.875rem',
-                  fontWeight: 'bold',
-                }}
-                title={language === 'ja' ? '単位の説明を表示' : 'Show unit description'}
-              >
-                ℹ️
-              </button>
-            )}
-          </div>
-        </div>
-        {showUnitDescription === fromUnit.id && fromUnit.description && (
-          <div style={{
-            marginTop: '0.5rem',
-            padding: '0.75rem',
-            backgroundColor: colors.bgTertiary,
-            borderRadius: '4px',
-            border: `1px solid ${colors.borderAccent}`,
-            fontSize: '0.875rem',
-            color: colors.text,
-          }}>
-            {fromUnit.description}
-          </div>
-        )}
-      </div>
-
-      {/* 変換先 */}
-      <div style={{ marginBottom: '1.5rem' }}>
-        <label
-          htmlFor="to-unit"
+        <input
+          id="input-value"
+          type="number"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
           style={{
-            display: 'block',
-            marginBottom: '0.5rem',
-            fontWeight: 'bold',
-          }}
-        >
-          {t('to')}:
-        </label>
-        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-          <select
-            id="to-unit"
-            value={toUnit.id}
-            onChange={(e) => handleToUnitChange(e.target.value)}
-            style={{
-              flex: 1,
-              padding: '0.5rem',
-              fontSize: '1rem',
-              borderRadius: '4px',
-              border: `1px solid ${colors.border}`,
-              backgroundColor: colors.bg,
-              color: colors.text,
-            }}
-          >
-            {selectedCategory.units.map((unit) => (
-              <option key={unit.id} value={unit.id}>
-                {unit.name}
-              </option>
-            ))}
-          </select>
-          {toUnit.description && (
-            <button
-              onClick={() => setShowUnitDescription(showUnitDescription === toUnit.id ? null : toUnit.id)}
-              style={{
-                padding: '0.5rem',
-                backgroundColor: colors.bgSecondary,
-                color: colors.textAccent,
-                border: `1px solid ${colors.border}`,
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '0.875rem',
-                fontWeight: 'bold',
-              }}
-              title={language === 'ja' ? '単位の説明を表示' : 'Show unit description'}
-            >
-              ℹ️
-            </button>
-          )}
-        </div>
-        {showUnitDescription === toUnit.id && toUnit.description && (
-          <div style={{
-            marginTop: '0.5rem',
+            width: '100%',
             padding: '0.75rem',
-            backgroundColor: colors.bgTertiary,
+            fontSize: '1.25rem',
             borderRadius: '4px',
-            border: `1px solid ${colors.borderAccent}`,
-            fontSize: '0.875rem',
+            border: `2px solid ${colors.borderAccent}`,
+            backgroundColor: colors.bg,
             color: colors.text,
-          }}>
-            {toUnit.description}
-          </div>
-        )}
+          }}
+          placeholder={language === 'ja' ? '例: 100' : 'e.g. 100'}
+        />
       </div>
 
       {/* 結果 */}
