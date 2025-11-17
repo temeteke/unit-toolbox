@@ -42,7 +42,6 @@ export default function UnitConverter() {
 
   // 新機能の状態
   const [showKeyboardHelp, setShowKeyboardHelp] = useState<boolean>(false);
-  const [showUnitDescription, setShowUnitDescription] = useState<string | null>(null);
 
   // ダークモード初期化（システム設定を検出）
   useEffect(() => {
@@ -162,7 +161,6 @@ export default function UnitConverter() {
       // Esc: モーダル/パネルを閉じる
       else if (e.key === 'Escape') {
         setShowKeyboardHelp(false);
-        setShowUnitDescription(null);
       }
     };
 
@@ -795,45 +793,25 @@ export default function UnitConverter() {
             <div style={{ fontSize: '0.75rem', color: colors.textSecondary, fontWeight: 'bold' }}>
               {t('from')}
             </div>
-            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-              <select
-                value={fromUnit.id}
-                onChange={(e) => handleFromUnitChange(e.target.value)}
-                style={{
-                  flex: 1,
-                  padding: '0.5rem',
-                  fontSize: '1rem',
-                  borderRadius: '4px',
-                  border: `1px solid ${colors.border}`,
-                  backgroundColor: colors.bg,
-                  color: colors.text,
-                }}
-              >
-                {selectedCategory.units.map((unit) => (
-                  <option key={unit.id} value={unit.id}>
-                    {unit.name}
-                  </option>
-                ))}
-              </select>
-              {fromUnit.description && (
-                <button
-                  onClick={() => setShowUnitDescription(showUnitDescription === fromUnit.id ? null : fromUnit.id)}
-                  style={{
-                    padding: '0.5rem',
-                    backgroundColor: colors.bgSecondary,
-                    color: colors.textAccent,
-                    border: `1px solid ${colors.border}`,
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '0.875rem',
-                    fontWeight: 'bold',
-                  }}
-                  title={language === 'ja' ? '単位の説明を表示' : 'Show unit description'}
-                >
-                  ℹ️
-                </button>
-              )}
-            </div>
+            <select
+              value={fromUnit.id}
+              onChange={(e) => handleFromUnitChange(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '0.5rem',
+                fontSize: '1rem',
+                borderRadius: '4px',
+                border: `1px solid ${colors.border}`,
+                backgroundColor: colors.bg,
+                color: colors.text,
+              }}
+            >
+              {selectedCategory.units.map((unit) => (
+                <option key={unit.id} value={unit.id}>
+                  {unit.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* 矢印 */}
@@ -846,75 +824,27 @@ export default function UnitConverter() {
             <div style={{ fontSize: '0.75rem', color: colors.textSecondary, fontWeight: 'bold' }}>
               {t('to')}
             </div>
-            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-              <select
-                value={toUnit.id}
-                onChange={(e) => handleToUnitChange(e.target.value)}
-                style={{
-                  flex: 1,
-                  padding: '0.5rem',
-                  fontSize: '1rem',
-                  borderRadius: '4px',
-                  border: `1px solid ${colors.border}`,
-                  backgroundColor: colors.bg,
-                  color: colors.text,
-                }}
-              >
-                {selectedCategory.units.map((unit) => (
-                  <option key={unit.id} value={unit.id}>
-                    {unit.name}
-                  </option>
-                ))}
-              </select>
-              {toUnit.description && (
-                <button
-                  onClick={() => setShowUnitDescription(showUnitDescription === toUnit.id ? null : toUnit.id)}
-                  style={{
-                    padding: '0.5rem',
-                    backgroundColor: colors.bgSecondary,
-                    color: colors.textAccent,
-                    border: `1px solid ${colors.border}`,
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '0.875rem',
-                    fontWeight: 'bold',
-                  }}
-                  title={language === 'ja' ? '単位の説明を表示' : 'Show unit description'}
-                >
-                  ℹ️
-                </button>
-              )}
-            </div>
+            <select
+              value={toUnit.id}
+              onChange={(e) => handleToUnitChange(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '0.5rem',
+                fontSize: '1rem',
+                borderRadius: '4px',
+                border: `1px solid ${colors.border}`,
+                backgroundColor: colors.bg,
+                color: colors.text,
+              }}
+            >
+              {selectedCategory.units.map((unit) => (
+                <option key={unit.id} value={unit.id}>
+                  {unit.name}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
-
-        {/* 単位の説明 */}
-        {showUnitDescription === fromUnit.id && fromUnit.description && (
-          <div style={{
-            marginTop: '0.75rem',
-            padding: '0.75rem',
-            backgroundColor: colors.bgTertiary,
-            borderRadius: '4px',
-            border: `1px solid ${colors.borderAccent}`,
-            fontSize: '0.875rem',
-            color: colors.text,
-          }}>
-            <strong>{fromUnit.name}:</strong> {fromUnit.description}
-          </div>
-        )}
-        {showUnitDescription === toUnit.id && toUnit.description && (
-          <div style={{
-            marginTop: '0.75rem',
-            padding: '0.75rem',
-            backgroundColor: colors.bgTertiary,
-            borderRadius: '4px',
-            border: `1px solid ${colors.borderAccent}`,
-            fontSize: '0.875rem',
-            color: colors.text,
-          }}>
-            <strong>{toUnit.name}:</strong> {toUnit.description}
-          </div>
-        )}
       </div>
 
       {/* 数値入力 */}
