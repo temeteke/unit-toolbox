@@ -2,20 +2,6 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { categories, convert, Unit, UnitCategory } from '@/utils/conversions';
-import {
-  getHistory,
-  saveHistory,
-  clearHistory,
-  getFavorites,
-  saveFavorite,
-  removeFavorite,
-  ConversionHistory,
-  FavoriteUnit,
-  exportData,
-  importData,
-  downloadAsJSON,
-  ExportData,
-} from '@/utils/storage';
 
 export default function UnitConverter() {
   // 基本的な状態
@@ -27,11 +13,7 @@ export default function UnitConverter() {
   const [toUnit, setToUnit] = useState<Unit>(categories[0].units[1]);
 
   // 新機能の状態
-  const [history, setHistory] = useState<ConversionHistory[]>([]);
-  const [favorites, setFavorites] = useState<FavoriteUnit[]>([]);
   const [darkMode, setDarkMode] = useState<boolean>(false);
-  const [showHistory, setShowHistory] = useState<boolean>(false);
-  const [showFavorites, setShowFavorites] = useState<boolean>(false);
 
   // 多言語対応
   const [language, setLanguage] = useState<'ja' | 'en'>('ja');
@@ -64,12 +46,6 @@ export default function UnitConverter() {
     return () => {
       mediaQuery.removeEventListener('change', handleChange);
     };
-  }, []);
-
-  // 履歴とお気に入りの読み込み
-  useEffect(() => {
-    setHistory(getHistory());
-    setFavorites(getFavorites());
   }, []);
 
   // オフライン状態の監視
@@ -132,26 +108,10 @@ export default function UnitConverter() {
     if (typeof window === 'undefined') return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Ctrl/Cmd + H: 履歴表示切替
-      if ((e.ctrlKey || e.metaKey) && e.key === 'h') {
-        e.preventDefault();
-        setShowHistory(prev => !prev);
-      }
-      // Ctrl/Cmd + F: お気に入り表示切替（ブラウザの検索と競合しないように）
-      else if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'F') {
-        e.preventDefault();
-        setShowFavorites(prev => !prev);
-      }
       // Ctrl/Cmd + K: カテゴリ選択にフォーカス
-      else if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
         document.getElementById('category')?.focus();
-      }
-      // Ctrl/Cmd + E: エクスポート
-      else if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
-        e.preventDefault();
-        const data = exportData();
-        downloadAsJSON(data, `unit-toolbox-backup-${new Date().toISOString().split('T')[0]}.json`);
       }
       // ?: ショートカットヘルプ表示
       else if (e.shiftKey && e.key === '?' && !(e.target as HTMLElement).matches('input, textarea')) {
@@ -175,14 +135,8 @@ export default function UnitConverter() {
       to: { ja: '変換先', en: 'To' },
       result: { ja: '変換結果', en: 'Result' },
       otherUnits: { ja: '他の単位への変換', en: 'Other Conversions' },
-      history: { ja: '履歴', en: 'History' },
-      favorites: { ja: 'お気に入り', en: 'Favorites' },
-      clearHistory: { ja: '履歴をクリア', en: 'Clear History' },
-      addFavorite: { ja: 'お気に入りに追加', en: 'Add to Favorites' },
       copy: { ja: 'コピー', en: 'Copy' },
       share: { ja: '共有', en: 'Share' },
-      export: { ja: 'エクスポート', en: 'Export' },
-      import: { ja: 'インポート', en: 'Import' },
       keyboardHelp: { ja: 'キーボードショートカット', en: 'Keyboard Shortcuts' },
     };
     return translations[key]?.[language] || key;
@@ -217,26 +171,6 @@ export default function UnitConverter() {
       ? convert(numericValue, fromUnit, toUnit)
       : 0;
 
-  // 変換が実行されたら履歴に保存
-  useEffect(() => {
-    if (!isNaN(numericValue) && isFinite(numericValue) && numericValue !== 0) {
-      const timer = setTimeout(() => {
-        saveHistory({
-          categoryId: selectedCategory.id,
-          categoryName: selectedCategory.name,
-          inputValue,
-          fromUnitId: fromUnit.id,
-          fromUnitName: fromUnit.name,
-          toUnitId: toUnit.id,
-          toUnitName: toUnit.name,
-          result,
-        });
-        setHistory(getHistory());
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [numericValue, fromUnit, toUnit, result, selectedCategory, inputValue]);
-
   const handleCopyResult = () => {
     const text = `${numericValue} ${fromUnit.name} = ${result.toLocaleString(language === 'ja' ? 'ja-JP' : 'en-US', {
       maximumFractionDigits: 10,
@@ -256,83 +190,6 @@ export default function UnitConverter() {
     navigator.clipboard.writeText(url.toString()).then(() => {
       alert(language === 'ja' ? 'URLをコピーしました！' : 'URL copied!');
     });
-  };
-
-  const handleAddFavorite = () => {
-    const label = `${fromUnit.name} → ${toUnit.name}`;
-    saveFavorite({
-      categoryId: selectedCategory.id,
-      fromUnitId: fromUnit.id,
-      toUnitId: toUnit.id,
-      label,
-    });
-    setFavorites(getFavorites());
-    alert(language === 'ja' ? 'お気に入りに追加しました！' : 'Added to favorites!');
-  };
-
-  const handleLoadFavorite = (fav: FavoriteUnit) => {
-    const category = categories.find(c => c.id === fav.categoryId);
-    if (category) {
-      setSelectedCategory(category);
-      const from = category.units.find(u => u.id === fav.fromUnitId);
-      const to = category.units.find(u => u.id === fav.toUnitId);
-      if (from) setFromUnit(from);
-      if (to) setToUnit(to);
-    }
-  };
-
-  const handleLoadHistory = (item: ConversionHistory) => {
-    const category = categories.find(c => c.id === item.categoryId);
-    if (category) {
-      setSelectedCategory(category);
-      const from = category.units.find(u => u.id === item.fromUnitId);
-      const to = category.units.find(u => u.id === item.toUnitId);
-      if (from) setFromUnit(from);
-      if (to) setToUnit(to);
-      setInputValue(item.inputValue);
-    }
-  };
-
-  // エクスポート機能
-  const handleExport = () => {
-    const data = exportData();
-    downloadAsJSON(data, `unit-toolbox-backup-${new Date().toISOString().split('T')[0]}.json`);
-    alert(language === 'ja' ? 'データをエクスポートしました！' : 'Data exported!');
-  };
-
-  // インポート機能
-  const handleImport = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'application/json';
-    input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        try {
-          const data = JSON.parse(event.target?.result as string) as ExportData;
-          const result = importData(data);
-
-          if (result.success) {
-            setHistory(getHistory());
-            setFavorites(getFavorites());
-            alert(language === 'ja' ? 'データをインポートしました！' : 'Data imported!');
-          } else {
-            alert(language === 'ja' ?
-              `インポートに失敗しました: ${result.error}` :
-              `Import failed: ${result.error}`);
-          }
-        } catch (error) {
-          alert(language === 'ja' ?
-            'ファイルの読み込みに失敗しました' :
-            'Failed to read file');
-        }
-      };
-      reader.readAsText(file);
-    };
-    input.click();
   };
 
   // スタイル定義
@@ -443,65 +300,7 @@ export default function UnitConverter() {
       )}
 
       {/* ヘッダーコントロール */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-          <button
-            onClick={() => setShowHistory(!showHistory)}
-            style={{
-              padding: '0.5rem 1rem',
-              backgroundColor: colors.button,
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '0.875rem',
-            }}
-          >
-            {t('history')}
-          </button>
-          <button
-            onClick={() => setShowFavorites(!showFavorites)}
-            style={{
-              padding: '0.5rem 1rem',
-              backgroundColor: colors.button,
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '0.875rem',
-            }}
-          >
-            {t('favorites')}
-          </button>
-          <button
-            onClick={handleExport}
-            style={{
-              padding: '0.5rem 1rem',
-              backgroundColor: colors.button,
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '0.875rem',
-            }}
-          >
-            {t('export')}
-          </button>
-          <button
-            onClick={handleImport}
-            style={{
-              padding: '0.5rem 1rem',
-              backgroundColor: colors.button,
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '0.875rem',
-            }}
-          >
-            {t('import')}
-          </button>
-        </div>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
           <button
             onClick={() => setShowKeyboardHelp(!showKeyboardHelp)}
@@ -571,12 +370,9 @@ export default function UnitConverter() {
             </h3>
             <div style={{ display: 'grid', gap: '0.75rem' }}>
               {[
-                { keys: language === 'ja' ? 'Ctrl/Cmd + H' : 'Ctrl/Cmd + H', desc: language === 'ja' ? '履歴表示切替' : 'Toggle history' },
-                { keys: language === 'ja' ? 'Ctrl/Cmd + Shift + F' : 'Ctrl/Cmd + Shift + F', desc: language === 'ja' ? 'お気に入り表示切替' : 'Toggle favorites' },
                 { keys: language === 'ja' ? 'Ctrl/Cmd + K' : 'Ctrl/Cmd + K', desc: language === 'ja' ? 'カテゴリ選択にフォーカス' : 'Focus on category' },
-                { keys: language === 'ja' ? 'Ctrl/Cmd + E' : 'Ctrl/Cmd + E', desc: language === 'ja' ? 'データをエクスポート' : 'Export data' },
                 { keys: '?', desc: language === 'ja' ? 'このヘルプを表示' : 'Show this help' },
-                { keys: 'Esc', desc: language === 'ja' ? 'モーダル/パネルを閉じる' : 'Close modals/panels' },
+                { keys: 'Esc', desc: language === 'ja' ? 'モーダルを閉じる' : 'Close modal' },
               ].map((shortcut, index) => (
                 <div
                   key={index}
@@ -613,131 +409,6 @@ export default function UnitConverter() {
             >
               {language === 'ja' ? '閉じる' : 'Close'}
             </button>
-          </div>
-        </div>
-      )}
-
-      {/* 履歴表示 */}
-      {showHistory && (
-        <div style={{
-          marginBottom: '1.5rem',
-          padding: '1rem',
-          backgroundColor: colors.bgSecondary,
-          borderRadius: '8px',
-          border: `1px solid ${colors.border}`,
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-            <h3 style={{ fontSize: '1rem', margin: 0 }}>{t('history')}</h3>
-            <button
-              onClick={() => {
-                clearHistory();
-                setHistory([]);
-              }}
-              style={{
-                padding: '0.25rem 0.75rem',
-                backgroundColor: '#ef4444',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '0.75rem',
-              }}
-            >
-              {t('clearHistory')}
-            </button>
-          </div>
-          <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
-            {history.length === 0 ? (
-              <p style={{ color: colors.textSecondary, fontSize: '0.875rem' }}>
-                {language === 'ja' ? '履歴がありません' : 'No history'}
-              </p>
-            ) : (
-              history.map((item) => (
-                <div
-                  key={item.id}
-                  onClick={() => handleLoadHistory(item)}
-                  style={{
-                    padding: '0.5rem',
-                    marginBottom: '0.5rem',
-                    backgroundColor: colors.bg,
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    border: `1px solid ${colors.border}`,
-                    fontSize: '0.875rem',
-                  }}
-                >
-                  <div style={{ fontWeight: 'bold', color: colors.textAccent }}>
-                    {item.categoryName}
-                  </div>
-                  <div>
-                    {item.inputValue} {item.fromUnitName} → {item.result.toLocaleString(language === 'ja' ? 'ja-JP' : 'en-US', { maximumFractionDigits: 6 })} {item.toUnitName}
-                  </div>
-                  <div style={{ fontSize: '0.75rem', color: colors.textSecondary }}>
-                    {new Date(item.timestamp).toLocaleString(language === 'ja' ? 'ja-JP' : 'en-US')}
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* お気に入り表示 */}
-      {showFavorites && (
-        <div style={{
-          marginBottom: '1.5rem',
-          padding: '1rem',
-          backgroundColor: colors.bgSecondary,
-          borderRadius: '8px',
-          border: `1px solid ${colors.border}`,
-        }}>
-          <h3 style={{ fontSize: '1rem', marginBottom: '0.75rem' }}>{t('favorites')}</h3>
-          <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
-            {favorites.length === 0 ? (
-              <p style={{ color: colors.textSecondary, fontSize: '0.875rem' }}>
-                {language === 'ja' ? 'お気に入りがありません' : 'No favorites'}
-              </p>
-            ) : (
-              favorites.map((fav) => (
-                <div
-                  key={fav.id}
-                  style={{
-                    padding: '0.5rem',
-                    marginBottom: '0.5rem',
-                    backgroundColor: colors.bg,
-                    borderRadius: '4px',
-                    border: `1px solid ${colors.border}`,
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}
-                >
-                  <div
-                    onClick={() => handleLoadFavorite(fav)}
-                    style={{ cursor: 'pointer', flex: 1, fontSize: '0.875rem' }}
-                  >
-                    {fav.label}
-                  </div>
-                  <button
-                    onClick={() => {
-                      removeFavorite(fav.id);
-                      setFavorites(getFavorites());
-                    }}
-                    style={{
-                      padding: '0.25rem 0.5rem',
-                      backgroundColor: '#ef4444',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                      fontSize: '0.75rem',
-                    }}
-                  >
-                    ×
-                  </button>
-                </div>
-              ))
-            )}
           </div>
         </div>
       )}
@@ -929,20 +600,6 @@ export default function UnitConverter() {
           }}
         >
           {t('share')}
-        </button>
-        <button
-          onClick={handleAddFavorite}
-          style={{
-            padding: '0.5rem 1rem',
-            backgroundColor: colors.button,
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontSize: '0.875rem',
-          }}
-        >
-          ★ {t('addFavorite')}
         </button>
       </div>
 
