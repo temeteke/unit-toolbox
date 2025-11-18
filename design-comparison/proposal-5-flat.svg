@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- 案5: フラットデザイン - マテリアルデザイン風 -->
+
+  <!-- 背景 - ソリッドカラー -->
+  <rect width="512" height="512" fill="#3B82F6" rx="80"/>
+
+  <!-- 定規のベース（オレンジ） -->
+  <rect x="85" y="205" width="342" height="102" fill="#FB923C" rx="12"/>
+
+  <!-- 定規の目盛り（ダークオレンジ） -->
+  <g fill="#C2410C">
+    <!-- 大きい目盛り -->
+    <rect x="125" y="217" width="4" height="34" rx="2"/>
+    <rect x="205" y="217" width="4" height="34" rx="2"/>
+    <rect x="285" y="217" width="4" height="34" rx="2"/>
+    <rect x="365" y="217" width="4" height="34" rx="2"/>
+
+    <!-- 小さい目盛り -->
+    <rect x="145" y="225" width="3" height="22" rx="1.5"/>
+    <rect x="165" y="225" width="3" height="22" rx="1.5"/>
+    <rect x="185" y="225" width="3" height="22" rx="1.5"/>
+    <rect x="225" y="225" width="3" height="22" rx="1.5"/>
+    <rect x="245" y="225" width="3" height="22" rx="1.5"/>
+    <rect x="265" y="225" width="3" height="22" rx="1.5"/>
+    <rect x="305" y="225" width="3" height="22" rx="1.5"/>
+    <rect x="325" y="225" width="3" height="22" rx="1.5"/>
+    <rect x="345" y="225" width="3" height="22" rx="1.5"/>
+    <rect x="385" y="225" width="3" height="22" rx="1.5"/>
+    <rect x="405" y="225" width="3" height="22" rx="1.5"/>
+  </g>
+
+  <!-- 双方向矢印（白、明確） -->
+  <g fill="#FFFFFF">
+    <!-- 左矢印 -->
+    <path d="M 138 268 L 103 268 L 103 251 L 138 251 L 138 239 L 87 259.5 L 138 280 Z"/>
+
+    <!-- 右矢印 -->
+    <path d="M 374 268 L 409 268 L 409 251 L 374 251 L 374 239 L 425 259.5 L 374 280 Z"/>
+
+    <!-- 中央の線 -->
+    <rect x="138" y="251" width="236" height="17" rx="4"/>
+  </g>
+
+  <!-- アクセントライン（定規の下部） -->
+  <rect x="85" y="287" width="342" height="20" fill="#EA580C" rx="12"/>
+</svg>
