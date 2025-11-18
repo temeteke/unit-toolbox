@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- V2案2: モダンな定規+カーブ矢印 -->
+
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4F46E5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06B6D4;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="512" height="512" fill="url(#bgGrad)" rx="80"/>
+
+  <!-- 定規 - 白 -->
+  <rect x="90" y="150" width="332" height="88" fill="#ffffff" rx="12"/>
+
+  <!-- 定規の目盛り（紺） -->
+  <g fill="#312E81" opacity="0.8">
+    <rect x="130" y="162" width="4" height="32" rx="2"/>
+    <rect x="206" y="162" width="4" height="32" rx="2"/>
+    <rect x="282" y="162" width="4" height="32" rx="2"/>
+    <rect x="358" y="162" width="4" height="32" rx="2"/>
+
+    <rect x="152" y="170" width="2.5" height="20" rx="1.25"/>
+    <rect x="174" y="170" width="2.5" height="20" rx="1.25"/>
+    <rect x="184" y="170" width="2.5" height="20" rx="1.25"/>
+    <rect x="228" y="170" width="2.5" height="20" rx="1.25"/>
+    <rect x="250" y="170" width="2.5" height="20" rx="1.25"/>
+    <rect x="260" y="170" width="2.5" height="20" rx="1.25"/>
+    <rect x="304" y="170" width="2.5" height="20" rx="1.25"/>
+    <rect x="326" y="170" width="2.5" height="20" rx="1.25"/>
+    <rect x="336" y="170" width="2.5" height="20" rx="1.25"/>
+    <rect x="380" y="170" width="2.5" height="20" rx="1.25"/>
+  </g>
+
+  <!-- 双方向矢印（2つのカーブ矢印で循環を表現） -->
+  <g fill="#FBBF24">
+    <!-- 左向きカーブ矢印（上） -->
+    <path d="M 360 280 Q 330 270, 300 280 L 300 265 L 270 285 L 300 305 L 300 290 Q 330 282, 360 290 Z"/>
+
+    <!-- 右向きカーブ矢印（下） -->
+    <path d="M 152 330 Q 182 340, 212 330 L 212 345 L 242 325 L 212 305 L 212 320 Q 182 328, 152 320 Z"/>
+  </g>
+
+  <!-- 中央に変換シンボル -->
+  <circle cx="256" cy="305" r="22" fill="#ffffff" opacity="0.95"/>
+  <g fill="#312E81">
+    <polygon points="256,295 262,301 256,307 250,301"/>
+    <polygon points="256,315 250,309 256,303 262,309"/>
+  </g>
+</svg>

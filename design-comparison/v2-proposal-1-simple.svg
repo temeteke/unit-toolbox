@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- V2案1: シンプルな定規+矢印（下配置） -->
+
+  <!-- 背景 - 濃い青 -->
+  <rect width="512" height="512" fill="#1E40AF" rx="80"/>
+
+  <!-- 定規 - 白 -->
+  <rect x="100" y="140" width="312" height="80" fill="#ffffff" rx="10"/>
+
+  <!-- 定規の目盛り（濃い青） -->
+  <g fill="#1E40AF">
+    <!-- 大きい目盛り -->
+    <rect x="140" y="150" width="4" height="35" rx="2"/>
+    <rect x="210" y="150" width="4" height="35" rx="2"/>
+    <rect x="280" y="150" width="4" height="35" rx="2"/>
+    <rect x="350" y="150" width="4" height="35" rx="2"/>
+
+    <!-- 小さい目盛り -->
+    <rect x="160" y="157" width="2.5" height="22" rx="1.25"/>
+    <rect x="180" y="157" width="2.5" height="22" rx="1.25"/>
+    <rect x="190" y="157" width="2.5" height="22" rx="1.25"/>
+    <rect x="230" y="157" width="2.5" height="22" rx="1.25"/>
+    <rect x="250" y="157" width="2.5" height="22" rx="1.25"/>
+    <rect x="260" y="157" width="2.5" height="22" rx="1.25"/>
+    <rect x="300" y="157" width="2.5" height="22" rx="1.25"/>
+    <rect x="320" y="157" width="2.5" height="22" rx="1.25"/>
+    <rect x="330" y="157" width="2.5" height="22" rx="1.25"/>
+    <rect x="370" y="157" width="2.5" height="22" rx="1.25"/>
+  </g>
+
+  <!-- 双方向矢印（定規の下、白） -->
+  <g fill="#ffffff">
+    <!-- 左矢印 -->
+    <polygon points="110,310 150,290 150,302 362,302 362,290 402,310 362,330 362,318 150,318 150,330"/>
+  </g>
+
+  <!-- 矢印の中央に小さな円（変換のシンボル） -->
+  <circle cx="256" cy="310" r="18" fill="#FBBF24"/>
+  <path d="M 256 302 L 256 318 M 248 310 L 264 310" stroke="#1E40AF" stroke-width="3" stroke-linecap="round"/>
+</svg>
