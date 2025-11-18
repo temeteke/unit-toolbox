@@ -192,7 +192,7 @@ export default function UnitConverter() {
   };
 
   return (
-    <div style={{ maxWidth: '1000px', margin: '0 auto', backgroundColor: colors.bg, color: colors.text, minHeight: '100vh', padding: '1rem' }}>
+    <div style={{ maxWidth: '1000px', margin: '0 auto', backgroundColor: colors.bg, color: colors.text, minHeight: '100vh', padding: '0.5rem' }}>
       {/* オフライン通知バナー */}
       {showOfflineNotice && !isOnline && (
         <div style={{

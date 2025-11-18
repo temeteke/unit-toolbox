@@ -37,7 +37,8 @@ export default function Home() {
 
   return (
     <main style={{
-      padding: '2rem',
+      padding: '0',
+      margin: '0',
       fontFamily: 'sans-serif',
       minHeight: '100vh',
       backgroundColor: colors.bg,
@@ -45,7 +46,7 @@ export default function Home() {
       transition: 'background-color 0.3s, color 0.3s',
     }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        <header style={{ marginBottom: '2rem', textAlign: 'center' }}>
+        <header style={{ marginBottom: '1rem', textAlign: 'center', padding: '1rem 0.5rem 0' }}>
           <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem', color: colors.text }}>
             Unit Toolbox - 単位変換ツール
           </h1>
@@ -54,7 +55,7 @@ export default function Home() {
           </p>
         </header>
 
-        <section style={{ marginBottom: '2rem' }}>
+        <section>
           <UnitConverter />
         </section>
       </div>
