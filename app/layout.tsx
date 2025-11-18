@@ -33,8 +33,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="ja">
-      <body>{children}</body>
+    <html lang="ja" style={{ margin: 0, padding: 0 }}>
+      <body style={{ margin: 0, padding: 0 }}>{children}</body>
     </html>
   )
 }
