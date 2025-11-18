@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- V3案4: アイコンスタイル - 定規と矢印を等しく強調 -->
+
+  <defs>
+    <linearGradient id="bgIcon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#EC4899;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8B5CF6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="512" height="512" fill="url(#bgIcon)" rx="80"/>
+
+  <!-- 定規 - コンパクト -->
+  <rect x="110" y="150" width="292" height="60" fill="#ffffff" rx="10"/>
+
+  <!-- 目盛り2本のみ -->
+  <g fill="#A855F7">
+    <rect x="200" y="160" width="6" height="30" rx="3"/>
+    <rect x="306" y="160" width="6" height="30" rx="3"/>
+  </g>
+
+  <!-- 超大きな矢印（白、太め） -->
+  <g fill="#ffffff">
+    <!-- 左矢印 -->
+    <path d="M 155 305 L 105 305 L 105 285 L 155 285 L 155 258 L 65 295 L 155 332 L 155 305 Z"/>
+
+    <!-- 右矢印 -->
+    <path d="M 357 305 L 407 305 L 407 285 L 357 285 L 357 258 L 447 295 L 357 332 L 357 305 Z"/>
+
+    <!-- 中央の太いライン -->
+    <rect x="155" y="285" width="202" height="20" rx="10"/>
+  </g>
+
+  <!-- 中央にドット（変換ポイント） -->
+  <circle cx="256" cy="295" r="20" fill="#FCD34D"/>
+</svg>
