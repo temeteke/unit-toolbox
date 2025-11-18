@@ -15,9 +15,6 @@ export default function UnitConverter() {
   // 新機能の状態
   const [darkMode, setDarkMode] = useState<boolean>(false);
 
-  // 多言語対応
-  const [language, setLanguage] = useState<'ja' | 'en'>('ja');
-
   // オフライン状態の検出
   const [isOnline, setIsOnline] = useState<boolean>(true);
   const [showOfflineNotice, setShowOfflineNotice] = useState<boolean>(false);
@@ -128,19 +125,6 @@ export default function UnitConverter() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const t = (key: string): string => {
-    const translations: Record<string, Record<'ja' | 'en', string>> = {
-      category: { ja: 'カテゴリを選択', en: 'Select Category' },
-      from: { ja: '変換元', en: 'From' },
-      to: { ja: '変換先', en: 'To' },
-      result: { ja: '変換結果', en: 'Result' },
-      otherUnits: { ja: '他の単位への変換', en: 'Other Conversions' },
-      copy: { ja: 'コピー', en: 'Copy' },
-      share: { ja: '共有', en: 'Share' },
-      keyboardHelp: { ja: 'キーボードショートカット', en: 'Keyboard Shortcuts' },
-    };
-    return translations[key]?.[language] || key;
-  };
 
   const handleCategoryChange = (categoryId: string) => {
     const category = categories.find((c) => c.id === categoryId);
@@ -172,11 +156,11 @@ export default function UnitConverter() {
       : 0;
 
   const handleCopyResult = () => {
-    const text = `${numericValue} ${fromUnit.name} = ${result.toLocaleString(language === 'ja' ? 'ja-JP' : 'en-US', {
+    const text = `${numericValue} ${fromUnit.name} = ${result.toLocaleString('ja-JP', {
       maximumFractionDigits: 10,
     })} ${toUnit.name}`;
     navigator.clipboard.writeText(text).then(() => {
-      alert(language === 'ja' ? 'コピーしました！' : 'Copied!');
+      alert('コピーしました！');
     });
   };
 
@@ -188,7 +172,7 @@ export default function UnitConverter() {
     url.searchParams.set('value', inputValue);
 
     navigator.clipboard.writeText(url.toString()).then(() => {
-      alert(language === 'ja' ? 'URLをコピーしました！' : 'URL copied!');
+      alert('URLをコピーしました！');
     });
   };
 
@@ -229,12 +213,10 @@ export default function UnitConverter() {
             <span style={{ fontSize: '1.25rem' }}>📡</span>
             <div>
               <div style={{ fontWeight: 'bold' }}>
-                {language === 'ja' ? 'オフライン モード' : 'Offline Mode'}
+                オフライン モード
               </div>
               <div style={{ fontSize: '0.875rem' }}>
-                {language === 'ja'
-                  ? 'インターネットに接続されていませんが、アプリは引き続き使用できます。'
-                  : 'You are offline, but the app will continue to work.'}
+                インターネットに接続されていませんが、アプリは引き続き使用できます。
               </div>
             </div>
           </div>
@@ -274,12 +256,10 @@ export default function UnitConverter() {
             <span style={{ fontSize: '1.25rem' }}>✓</span>
             <div>
               <div style={{ fontWeight: 'bold' }}>
-                {language === 'ja' ? 'オンラインに復帰しました' : 'Back Online'}
+                オンラインに復帰しました
               </div>
               <div style={{ fontSize: '0.875rem' }}>
-                {language === 'ja'
-                  ? 'インターネット接続が復元されました。'
-                  : 'Your internet connection has been restored.'}
+                インターネット接続が復元されました。
               </div>
             </div>
           </div>
@@ -299,40 +279,6 @@ export default function UnitConverter() {
         </div>
       )}
 
-      {/* ヘッダーコントロール */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-          <button
-            onClick={() => setShowKeyboardHelp(!showKeyboardHelp)}
-            style={{
-              padding: '0.5rem 1rem',
-              backgroundColor: colors.bgSecondary,
-              color: colors.text,
-              border: `1px solid ${colors.border}`,
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '0.875rem',
-            }}
-            title={language === 'ja' ? 'キーボードショートカット (?)' : 'Keyboard Shortcuts (?)'}
-          >
-            ?
-          </button>
-          <button
-            onClick={() => setLanguage(language === 'ja' ? 'en' : 'ja')}
-            style={{
-              padding: '0.5rem 1rem',
-              backgroundColor: colors.bgSecondary,
-              color: colors.text,
-              border: `1px solid ${colors.border}`,
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '0.875rem',
-            }}
-          >
-            {language === 'ja' ? 'EN' : 'JA'}
-          </button>
-        </div>
-      </div>
 
       {/* キーボードショートカットヘルプ */}
       {showKeyboardHelp && (
@@ -366,13 +312,13 @@ export default function UnitConverter() {
             onClick={(e) => e.stopPropagation()}
           >
             <h3 style={{ marginBottom: '1.5rem', fontSize: '1.25rem', fontWeight: 'bold' }}>
-              {t('keyboardHelp')}
+              キーボードショートカット
             </h3>
             <div style={{ display: 'grid', gap: '0.75rem' }}>
               {[
-                { keys: language === 'ja' ? 'Ctrl/Cmd + K' : 'Ctrl/Cmd + K', desc: language === 'ja' ? 'カテゴリ選択にフォーカス' : 'Focus on category' },
-                { keys: '?', desc: language === 'ja' ? 'このヘルプを表示' : 'Show this help' },
-                { keys: 'Esc', desc: language === 'ja' ? 'モーダルを閉じる' : 'Close modal' },
+                { keys: 'Ctrl/Cmd + K', desc: 'カテゴリ選択にフォーカス' },
+                { keys: '?', desc: 'このヘルプを表示' },
+                { keys: 'Esc', desc: 'モーダルを閉じる' },
               ].map((shortcut, index) => (
                 <div
                   key={index}
@@ -407,7 +353,7 @@ export default function UnitConverter() {
                 width: '100%',
               }}
             >
-              {language === 'ja' ? '閉じる' : 'Close'}
+              閉じる
             </button>
           </div>
         </div>
@@ -423,7 +369,7 @@ export default function UnitConverter() {
             fontWeight: 'bold',
           }}
         >
-          {t('category')}:
+          カテゴリを選択:
         </label>
         <select
           id="category"
@@ -456,13 +402,13 @@ export default function UnitConverter() {
             fontWeight: 'bold',
           }}
         >
-          {language === 'ja' ? '変換する単位を選択' : 'Select Units'}:
+          変換する単位を選択:
         </label>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
           {/* 変換元の単位 */}
-          <div style={{ flex: 1, minWidth: '200px', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <div style={{ fontSize: '0.75rem', color: colors.textSecondary, fontWeight: 'bold' }}>
-              {t('from')}
+              変換元
             </div>
             <select
               value={fromUnit.id}
@@ -485,15 +431,10 @@ export default function UnitConverter() {
             </select>
           </div>
 
-          {/* 矢印 */}
-          <div style={{ fontSize: '1.5rem', color: colors.textAccent, marginTop: '1.25rem' }}>
-            →
-          </div>
-
           {/* 変換先の単位 */}
-          <div style={{ flex: 1, minWidth: '200px', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <div style={{ fontSize: '0.75rem', color: colors.textSecondary, fontWeight: 'bold' }}>
-              {t('to')}
+              変換先
             </div>
             <select
               value={toUnit.id}
@@ -528,7 +469,7 @@ export default function UnitConverter() {
             fontWeight: 'bold',
           }}
         >
-          {language === 'ja' ? '数値を入力' : 'Enter Value'}:
+          数値を入力:
         </label>
         <input
           id="input-value"
@@ -537,14 +478,15 @@ export default function UnitConverter() {
           onChange={(e) => setInputValue(e.target.value)}
           style={{
             width: '100%',
-            padding: '0.75rem',
-            fontSize: '1.25rem',
+            padding: '0.5rem',
+            fontSize: '1rem',
             borderRadius: '4px',
             border: `2px solid ${colors.borderAccent}`,
             backgroundColor: colors.bg,
             color: colors.text,
+            boxSizing: 'border-box',
           }}
-          placeholder={language === 'ja' ? '例: 100' : 'e.g. 100'}
+          placeholder="例: 100"
         />
       </div>
 
@@ -559,10 +501,10 @@ export default function UnitConverter() {
         }}
       >
         <div style={{ fontSize: '0.875rem', color: colors.textAccent, marginBottom: '0.5rem' }}>
-          {t('result')}:
+          変換結果:
         </div>
         <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: colors.textAccentStrong }}>
-          {result.toLocaleString(language === 'ja' ? 'ja-JP' : 'en-US', {
+          {result.toLocaleString('ja-JP', {
             maximumFractionDigits: 10,
           })}{' '}
           <span style={{ fontSize: '1rem', fontWeight: 'normal' }}>
@@ -572,41 +514,58 @@ export default function UnitConverter() {
       </div>
 
       {/* アクションボタン */}
-      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button
+            onClick={handleCopyResult}
+            style={{
+              padding: '0.5rem 1rem',
+              backgroundColor: colors.button,
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '0.875rem',
+            }}
+          >
+            コピー
+          </button>
+          <button
+            onClick={handleShareURL}
+            style={{
+              padding: '0.5rem 1rem',
+              backgroundColor: colors.button,
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '0.875rem',
+            }}
+          >
+            共有
+          </button>
+        </div>
         <button
-          onClick={handleCopyResult}
+          onClick={() => setShowKeyboardHelp(!showKeyboardHelp)}
           style={{
-            padding: '0.5rem 1rem',
-            backgroundColor: colors.button,
-            color: 'white',
-            border: 'none',
+            padding: '0.5rem 0.75rem',
+            backgroundColor: colors.bgSecondary,
+            color: colors.text,
+            border: `1px solid ${colors.border}`,
             borderRadius: '4px',
             cursor: 'pointer',
             fontSize: '0.875rem',
           }}
+          title="キーボードショートカット (?)"
         >
-          {t('copy')}
-        </button>
-        <button
-          onClick={handleShareURL}
-          style={{
-            padding: '0.5rem 1rem',
-            backgroundColor: colors.button,
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontSize: '0.875rem',
-          }}
-        >
-          {t('share')}
+          ?
         </button>
       </div>
 
       {/* すべての単位への変換結果を表示 */}
       <div style={{ marginTop: '2rem' }}>
         <h3 style={{ marginBottom: '1rem', fontSize: '1.125rem', fontWeight: 'bold' }}>
-          {t('otherUnits')}:
+          他の単位への変換:
         </h3>
         <div
           style={{
@@ -636,7 +595,7 @@ export default function UnitConverter() {
                     {unit.name}
                   </div>
                   <div style={{ fontSize: '1rem', fontWeight: '600', color: colors.text }}>
-                    {convertedValue.toLocaleString(language === 'ja' ? 'ja-JP' : 'en-US', {
+                    {convertedValue.toLocaleString('ja-JP', {
                       maximumFractionDigits: 6,
                     })}
                   </div>
