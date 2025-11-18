@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>矢印の隙間問題 - 改善案比較</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f5f5f5;
+      padding: 40px 20px;
+      margin: 0;
+    }
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 50px;
+      font-size: 18px;
+    }
+    .problem-section {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 40px;
+    }
+    .problem-section h3 {
+      color: #856404;
+      margin-top: 0;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 30px;
+      margin-bottom: 60px;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      text-align: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+    .card h2 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      color: #555;
+      font-size: 20px;
+    }
+    .icon-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 25px;
+      margin-bottom: 20px;
+      padding: 25px;
+      background: #fafafa;
+      border-radius: 8px;
+    }
+    .icon-wrapper {
+      text-align: center;
+    }
+    .icon-wrapper img {
+      display: block;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .icon-label {
+      font-size: 13px;
+      color: #888;
+      font-weight: 600;
+    }
+    .description {
+      color: #666;
+      font-size: 14px;
+      line-height: 1.6;
+      text-align: left;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+    }
+    .description h3 {
+      font-size: 16px;
+      margin-top: 0;
+      margin-bottom: 10px;
+      color: #444;
+    }
+    .description ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+    .description li {
+      margin-bottom: 5px;
+    }
+    .pros {
+      color: #4CAF50;
+    }
+    .cons {
+      color: #F44336;
+    }
+    .recommended {
+      border: 3px solid #4CAF50;
+      background: #f1f8f4;
+    }
+    .comparison-section {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      margin-top: 40px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .comparison-section h2 {
+      margin-top: 0;
+      color: #333;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    th {
+      background: #f5f5f5;
+      font-weight: 600;
+      color: #555;
+    }
+    .recommendation {
+      background: #e8f5e9;
+      border-left: 4px solid #4CAF50;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+    .recommendation h3 {
+      color: #2e7d32;
+      margin-top: 0;
+    }
+    .zoom-view {
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 15px;
+      text-align: center;
+    }
+    .zoom-view img {
+      width: 200px;
+      height: 200px;
+      image-rendering: pixelated;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+    }
+    .zoom-label {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔧 矢印の隙間問題 - 改善案比較</h1>
+    <p class="subtitle">矢印の棒と矢の間の隙間をなくす7つの改善アプローチ</p>
+
+    <div class="problem-section">
+      <h3>⚠️ 問題点</h3>
+      <p>現在のデザインでは、矢印の中央の棒の端が丸まっている（border-radius設定）ため、矢の三角形部分と棒の間に視覚的な隙間が生じています。特に小サイズ（16px）で目立ちます。</p>
+      <h4>改善アプローチ：</h4>
+      <ul>
+        <li><strong>案1:</strong> 矢印全体を一つのpathで描画（最もクリーン）</li>
+        <li><strong>案2:</strong> 棒を矢の内側まで伸ばす</li>
+        <li><strong>案3:</strong> 棒の端を角張らせる（border-radiusなし）</li>
+        <li><strong>案4:</strong> 棒を太くして隙間を目立たなくする</li>
+        <li><strong>案5:</strong> 矢と棒を重ねる</li>
+        <li><strong>案6:</strong> 矢印をより鋭く、棒と一体化</li>
+        <li><strong>案7:</strong> カスタムpathで部分的に丸める</li>
+      </ul>
+    </div>
+
+    <div class="grid">
+      <!-- 改善案1 -->
+      <div class="card recommended">
+        <h2>改善案1: 一体型path ⭐推奨</h2>
+        <div class="icon-container">
+          <div class="icon-wrapper">
+            <img src="arrow-fix-1-unified-path.svg" width="128" height="128" alt="Fix 1">
+            <div class="icon-label">128px</div>
+          </div>
+          <div class="icon-wrapper">
+            <img src="arrow-fix-1-unified-path.svg" width="32" height="32" alt="Fix 1">
+            <div class="icon-label">32px</div>
+          </div>
+          <div class="icon-wrapper">
+            <img src="arrow-fix-1-unified-path.svg" width="16" height="16" alt="Fix 1">
+            <div class="icon-label">16px</div>
+          </div>
+        </div>
+        <div class="zoom-view">
+          <img src="arrow-fix-1-unified-path.svg" alt="拡大表示">
+          <div class="zoom-label">拡大表示（隙間なし）</div>
+        </div>
+        <div class="description">
+          <h3>アプローチ</h3>
+          <ul>
+            <li>矢印全体を一つのpathで描画</li>
+            <li>隙間が完全になくなる</li>
+          </ul>
+          <h3 class="pros">長所</h3>
+          <ul>
+            <li>完全に隙間がない</li>
+            <li>最もクリーンな解決策</li>
+            <li>SVGコードがシンプル</li>
+            <li>すべてのサイズで完璧</li>
+          </ul>
+          <h3 class="cons">短所</h3>
+          <ul>
+            <li>特になし</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 改善案2 -->
+      <div class="card">
+        <h2>改善案2: 棒を伸ばす</h2>
+        <div class="icon-container">
+          <div class="icon-wrapper">
+            <img src="arrow-fix-2-extended-bar.svg" width="128" height="128" alt="Fix 2">
+            <div class="icon-label">128px</div>
+          </div>
+          <div class="icon-wrapper">
+            <img src="arrow-fix-2-extended-bar.svg" width="32" height="32" alt="Fix 2">
+            <div class="icon-label">32px</div>
+          </div>
+          <div class="icon-wrapper">
+            <img src="arrow-fix-2-extended-bar.svg" width="16" height="16" alt="Fix 2">
+            <div class="icon-label">16px</div>
+          </div>
+        </div>
+        <div class="zoom-view">
+          <img src="arrow-fix-2-extended-bar.svg" alt="拡大表示">
+          <div class="zoom-label">拡大表示</div>
+        </div>
+        <div class="description">
+          <h3>アプローチ</h3>
+          <ul>
+            <li>棒を矢の内側まで伸ばす</li>
+            <li>角張った端</li>
+          </ul>
+          <h3 class="pros">長所</h3>
+          <ul>
+            <li>隙間がほぼない</li>
+            <li>実装が簡単</li>
+          </ul>
+          <h3 class="cons">短所</h3>
+          <ul>
+            <li>矢の内部に棒が見える</li>
+            <li>やや不自然</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 改善案3 -->
+      <div class="card recommended">
+        <h2>改善案3: 角張った端 ⭐推奨</h2>
+        <div class="icon-container">
+          <div class="icon-wrapper">
+            <img src="arrow-fix-3-square-edges.svg" width="128" height="128" alt="Fix 3">
+            <div class="icon-label">128px</div>
+          </div>
+          <div class="icon-wrapper">
+            <img src="arrow-fix-3-square-edges.svg" width="32" height="32" alt="Fix 3">
+            <div class="icon-label">32px</div>
+          </div>
+          <div class="icon-wrapper">
+            <img src="arrow-fix-3-square-edges.svg" width="16" height="16" alt="Fix 3">
+            <div class="icon-label">16px</div>
+          </div>
+        </div>
+        <div class="zoom-view">
+          <img src="arrow-fix-3-square-edges.svg" alt="拡大表示">
+          <div class="zoom-label">拡大表示</div>
+        </div>
+        <div class="description">
+          <h3>アプローチ</h3>
+          <ul>
+            <li>棒の端のborder-radiusを削除</li>
+            <li>シンプルな解決策</li>
+          </ul>
+          <h3 class="pros">長所</h3>
+          <ul>
+            <li>隙間がほぼなくなる</li>
+            <li>実装が非常に簡単</li>
+            <li>クリーンな見た目</li>
+          </ul>
+          <h3 class="cons">短所</h3>
+          <ul>
+            <li>わずかに隙間が見える（ピクセルレベル）</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 改善案4 -->
+      <div class="card">
+        <h2>改善案4: 太い棒</h2>
+        <div class="icon-container">
+          <div class="icon-wrapper">
+            <img src="arrow-fix-4-thicker-bar.svg" width="128" height="128" alt="Fix 4">
+            <div class="icon-label">128px</div>
+          </div>
+          <div class="icon-wrapper">
+            <img src="arrow-fix-4-thicker-bar.svg" width="32" height="32" alt="Fix 4">
+            <div class="icon-label">32px</div>
+          </div>
+          <div class="icon-wrapper">
+            <img src="arrow-fix-4-thicker-bar.svg" width="16" height="16" alt="Fix 4">
+            <div class="icon-label">16px</div>
+          </div>
+        </div>
+        <div class="zoom-view">
+          <img src="arrow-fix-4-thicker-bar.svg" alt="拡大表示">
+          <div class="zoom-label">拡大表示</div>
+        </div>
+        <div class="description">
+          <h3>アプローチ</h3>
+          <ul>
+            <li>棒を40pxに太くする</li>
+            <li>丸い端を維持</li>
+          </ul>
+          <h3 class="pros">長所</h3>
+          <ul>
+            <li>隙間が目立たない</li>
+            <li>インパクトがある</li>
+          </ul>
+          <h3 class="cons">短所</h3>
+          <ul>
+            <li>隙間は残る</li>
+            <li>棒が太すぎる可能性</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 改善案5 -->
+      <div class="card">
+        <h2>改善案5: 重なり</h2>
+        <div class="icon-container">
+          <div class="icon-wrapper">
+            <img src="arrow-fix-5-overlapping.svg" width="128" height="128" alt="Fix 5">
+            <div class="icon-label">128px</div>
+          </div>
+          <div class="icon-wrapper">
+            <img src="arrow-fix-5-overlapping.svg" width="32" height="32" alt="Fix 5">
+            <div class="icon-label">32px</div>
+          </div>
+          <div class="icon-wrapper">
+            <img src="arrow-fix-5-overlapping.svg" width="16" height="16" alt="Fix 5">
+            <div class="icon-label">16px</div>
+          </div>
+        </div>
+        <div class="zoom-view">
+          <img src="arrow-fix-5-overlapping.svg" alt="拡大表示">
+          <div class="zoom-label">拡大表示</div>
+        </div>
+        <div class="description">
+          <h3>アプローチ</h3>
+          <ul>
+            <li>棒を矢に重ねる</li>
+            <li>やや細めの棒</li>
+          </ul>
+          <h3 class="pros">長所</h3>
+          <ul>
+            <li>隙間が目立たない</li>
+            <li>バランスが良い</li>
+          </ul>
+          <h3 class="cons">短所</h3>
+          <ul>
+            <li>わずかに隙間が見える</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 改善案6 -->
+      <div class="card recommended">
+        <h2>改善案6: 鋭い矢印 ⭐推奨</h2>
+        <div class="icon-container">
+          <div class="icon-wrapper">
+            <img src="arrow-fix-6-sharp-arrows.svg" width="128" height="128" alt="Fix 6">
+            <div class="icon-label">128px</div>
+          </div>
+          <div class="icon-wrapper">
+            <img src="arrow-fix-6-sharp-arrows.svg" width="32" height="32" alt="Fix 6">
+            <div class="icon-label">32px</div>
+          </div>
+          <div class="icon-wrapper">
+            <img src="arrow-fix-6-sharp-arrows.svg" width="16" height="16" alt="Fix 6">
+            <div class="icon-label">16px</div>
+          </div>
+        </div>
+        <div class="zoom-view">
+          <img src="arrow-fix-6-sharp-arrows.svg" alt="拡大表示">
+          <div class="zoom-label">拡大表示（より鋭い）</div>
+        </div>
+        <div class="description">
+          <h3>アプローチ</h3>
+          <ul>
+            <li>一体型pathで描画</li>
+            <li>矢をより鋭く（265-335度）</li>
+          </ul>
+          <h3 class="pros">長所</h3>
+          <ul>
+            <li>完全に隙間がない</li>
+            <li>よりシャープで現代的</li>
+            <li>動的な印象</li>
+          </ul>
+          <h3 class="cons">短所</h3>
+          <ul>
+            <li>特になし</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 改善案7 -->
+      <div class="card">
+        <h2>改善案7: カスタム丸め</h2>
+        <div class="icon-container">
+          <div class="icon-wrapper">
+            <img src="arrow-fix-7-custom-rounded.svg" width="128" height="128" alt="Fix 7">
+            <div class="icon-label">128px</div>
+          </div>
+          <div class="icon-wrapper">
+            <img src="arrow-fix-7-custom-rounded.svg" width="32" height="32" alt="Fix 7">
+            <div class="icon-label">32px</div>
+          </div>
+          <div class="icon-wrapper">
+            <img src="arrow-fix-7-custom-rounded.svg" width="16" height="16" alt="Fix 7">
+            <div class="icon-label">16px</div>
+          </div>
+        </div>
+        <div class="zoom-view">
+          <img src="arrow-fix-7-custom-rounded.svg" alt="拡大表示">
+          <div class="zoom-label">拡大表示</div>
+        </div>
+        <div class="description">
+          <h3>アプローチ</h3>
+          <ul>
+            <li>pathで部分的な丸みを実装</li>
+            <li>矢との接続部は角張る</li>
+          </ul>
+          <h3 class="pros">長所</h3>
+          <ul>
+            <li>丸みを保ちつつ隙間がない</li>
+          </ul>
+          <h3 class="cons">短所</h3>
+          <ul>
+            <li>実装が複雑</li>
+            <li>小サイズで効果が見えにくい</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="comparison-section">
+      <h2>総合比較表</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>改善案</th>
+            <th>隙間なし</th>
+            <th>実装の簡単さ</th>
+            <th>見た目の美しさ</th>
+            <th>16px視認性</th>
+            <th>推奨度</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background: #f1f8f4;">
+            <td><strong>案1: 一体型path</strong></td>
+            <td>⭐⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐⭐</td>
+          </tr>
+          <tr>
+            <td><strong>案2: 棒を伸ばす</strong></td>
+            <td>⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐</td>
+          </tr>
+          <tr style="background: #f1f8f4;">
+            <td><strong>案3: 角張った端</strong></td>
+            <td>⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐⭐</td>
+          </tr>
+          <tr>
+            <td><strong>案4: 太い棒</strong></td>
+            <td>⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐</td>
+          </tr>
+          <tr>
+            <td><strong>案5: 重なり</strong></td>
+            <td>⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐</td>
+          </tr>
+          <tr style="background: #f1f8f4;">
+            <td><strong>案6: 鋭い矢印</strong></td>
+            <td>⭐⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐⭐</td>
+          </tr>
+          <tr>
+            <td><strong>案7: カスタム丸め</strong></td>
+            <td>⭐⭐⭐⭐⭐</td>
+            <td>⭐⭐</td>
+            <td>⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐⭐</td>
+            <td>⭐⭐⭐</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="recommendation">
+        <h3>🏆 推奨トップ3</h3>
+
+        <h4 style="color: #2e7d32;">第1推奨: 改善案1（一体型path）または改善案6（鋭い矢印）</h4>
+        <p><strong>理由:</strong></p>
+        <ul>
+          <li>完全に隙間がない完璧な解決策</li>
+          <li>すべてのサイズで美しく表示される</li>
+          <li>案6はより鋭くモダンな印象</li>
+          <li>SVGコードがクリーンで保守しやすい</li>
+        </ul>
+
+        <h4 style="color: #1565C0; margin-top: 20px;">第2推奨: 改善案3（角張った端）</h4>
+        <p><strong>理由:</strong></p>
+        <ul>
+          <li>最も簡単な実装（rx属性を削除するだけ）</li>
+          <li>隙間がほぼ完全になくなる</li>
+          <li>クリーンで明快な見た目</li>
+          <li>すぐに実装可能</li>
+        </ul>
+
+        <h4 style="color: #558B2F; margin-top: 20px;">第3推奨: 改善案5（重なり）</h4>
+        <p><strong>理由:</strong></p>
+        <ul>
+          <li>バランスの良い見た目</li>
+          <li>隙間が目立たない</li>
+          <li>実装が比較的簡単</li>
+        </ul>
+
+        <h3 style="margin-top: 30px; color: #1976D2;">💡 最終推奨</h3>
+        <p style="font-size: 16px; line-height: 1.8;">
+          <strong>改善案6（鋭い矢印）</strong>を最も推奨します。完全に隙間がなく、より鋭い矢印で現代的な印象を与え、
+          視認性も最高レベルです。実装もpathを使うだけで、コードもシンプルに保てます。
+        </p>
+        <p style="font-size: 16px; line-height: 1.8;">
+          シンプルさを重視する場合は<strong>改善案3（角張った端）</strong>も優れた選択肢です。
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
