@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- 最終版 V3-5-4: シアン背景 -->
+
+  <defs>
+    <linearGradient id="bgCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0EA5E9;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06B6D4;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- 背景 - シアングラデーション -->
+  <rect width="512" height="512" fill="url(#bgCyan)" rx="80"/>
+
+  <!-- 定規 -->
+  <rect x="100" y="155" width="312" height="65" fill="#FCD34D" rx="10"/>
+
+  <!-- 装飾ライン -->
+  <g fill="#92400E" opacity="0.6">
+    <rect x="150" y="165" width="3" height="45" rx="1.5"/>
+    <rect x="230" y="165" width="3" height="45" rx="1.5"/>
+    <rect x="280" y="165" width="3" height="45" rx="1.5"/>
+    <rect x="360" y="165" width="3" height="45" rx="1.5"/>
+  </g>
+
+  <!-- 一体型の鋭い双方向矢印（隙間なし） -->
+  <g fill="#ffffff">
+    <path d="M 75,300 L 160,265 L 160,285 L 352,285 L 352,265 L 437,300 L 352,335 L 352,315 L 160,315 L 160,335 Z"/>
+  </g>
+</svg>
