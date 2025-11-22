@@ -10,7 +10,6 @@ export default function UnitConverter() {
   );
   const [inputValue, setInputValue] = useState<string>('1');
   const [fromUnit, setFromUnit] = useState<Unit>(categories[0].units[0]);
-  const [toUnit, setToUnit] = useState<Unit>(categories[0].units[1]);
 
   // 新機能の状態
   const [darkMode, setDarkMode] = useState<boolean>(false);
@@ -77,7 +76,6 @@ export default function UnitConverter() {
       const params = new URLSearchParams(window.location.search);
       const categoryId = params.get('category');
       const fromUnitId = params.get('from');
-      const toUnitId = params.get('to');
       const value = params.get('value');
 
       if (categoryId) {
@@ -87,10 +85,6 @@ export default function UnitConverter() {
           if (fromUnitId) {
             const unit = category.units.find(u => u.id === fromUnitId);
             if (unit) setFromUnit(unit);
-          }
-          if (toUnitId) {
-            const unit = category.units.find(u => u.id === toUnitId);
-            if (unit) setToUnit(unit);
           }
         }
       }
@@ -131,7 +125,6 @@ export default function UnitConverter() {
     if (category) {
       setSelectedCategory(category);
       setFromUnit(category.units[0]);
-      setToUnit(category.units[1] || category.units[0]);
     }
   };
 
@@ -142,24 +135,14 @@ export default function UnitConverter() {
     }
   };
 
-  const handleToUnitChange = (unitId: string) => {
-    const unit = selectedCategory.units.find((u) => u.id === unitId);
-    if (unit) {
-      setToUnit(unit);
-    }
-  };
-
   const numericValue = parseFloat(inputValue);
-  const result =
-    !isNaN(numericValue) && isFinite(numericValue)
-      ? convert(numericValue, fromUnit, toUnit)
-      : 0;
 
-  const handleCopyResult = () => {
-    const text = `${numericValue} ${fromUnit.name} = ${result.toLocaleString('ja-JP', {
+  const handleCopyConversion = (toUnit: Unit, convertedValue: number) => {
+    const text = `${numericValue} ${fromUnit.name} = ${convertedValue.toLocaleString('ja-JP', {
       maximumFractionDigits: 10,
     })} ${toUnit.name}`;
     navigator.clipboard.writeText(text).then(() => {
+      // コピー成功の視覚的フィードバック
       alert('コピーしました！');
     });
   };
@@ -168,7 +151,6 @@ export default function UnitConverter() {
     const url = new URL(window.location.href);
     url.searchParams.set('category', selectedCategory.id);
     url.searchParams.set('from', fromUnit.id);
-    url.searchParams.set('to', toUnit.id);
     url.searchParams.set('value', inputValue);
 
     navigator.clipboard.writeText(url.toString()).then(() => {
@@ -393,70 +375,38 @@ export default function UnitConverter() {
         </select>
       </div>
 
-      {/* 単位選択：変換元 → 変換先 */}
+      {/* 変換元の単位選択 */}
       <div style={{ marginBottom: '1.5rem' }}>
         <label
+          htmlFor="from-unit"
           style={{
             display: 'block',
             marginBottom: '0.5rem',
             fontWeight: 'bold',
           }}
         >
-          変換する単位を選択:
+          変換元の単位:
         </label>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-          {/* 変換元の単位 */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <div style={{ fontSize: '0.75rem', color: colors.textSecondary, fontWeight: 'bold' }}>
-              変換元
-            </div>
-            <select
-              value={fromUnit.id}
-              onChange={(e) => handleFromUnitChange(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '0.5rem',
-                fontSize: '1rem',
-                borderRadius: '4px',
-                border: `1px solid ${colors.border}`,
-                backgroundColor: colors.bg,
-                color: colors.text,
-              }}
-            >
-              {selectedCategory.units.map((unit) => (
-                <option key={unit.id} value={unit.id}>
-                  {unit.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* 変換先の単位 */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <div style={{ fontSize: '0.75rem', color: colors.textSecondary, fontWeight: 'bold' }}>
-              変換先
-            </div>
-            <select
-              value={toUnit.id}
-              onChange={(e) => handleToUnitChange(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '0.5rem',
-                fontSize: '1rem',
-                borderRadius: '4px',
-                border: `1px solid ${colors.border}`,
-                backgroundColor: colors.bg,
-                color: colors.text,
-              }}
-            >
-              {selectedCategory.units.map((unit) => (
-                <option key={unit.id} value={unit.id}>
-                  {unit.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+        <select
+          id="from-unit"
+          value={fromUnit.id}
+          onChange={(e) => handleFromUnitChange(e.target.value)}
+          style={{
+            width: '100%',
+            padding: '0.5rem',
+            fontSize: '1rem',
+            borderRadius: '4px',
+            border: `1px solid ${colors.border}`,
+            backgroundColor: colors.bg,
+            color: colors.text,
+          }}
+        >
+          {selectedCategory.units.map((unit) => (
+            <option key={unit.id} value={unit.id}>
+              {unit.name}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* 数値入力 */}
@@ -490,61 +440,22 @@ export default function UnitConverter() {
         />
       </div>
 
-      {/* 結果 */}
-      <div
-        style={{
-          padding: '1.5rem',
-          backgroundColor: colors.bgTertiary,
-          borderRadius: '8px',
-          border: `2px solid ${colors.borderAccent}`,
-          marginBottom: '1rem',
-        }}
-      >
-        <div style={{ fontSize: '0.875rem', color: colors.textAccent, marginBottom: '0.5rem' }}>
-          変換結果:
-        </div>
-        <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: colors.textAccentStrong }}>
-          {result.toLocaleString('ja-JP', {
-            maximumFractionDigits: 10,
-          })}{' '}
-          <span style={{ fontSize: '1rem', fontWeight: 'normal' }}>
-            {toUnit.name}
-          </span>
-        </div>
-      </div>
-
       {/* アクションボタン */}
       <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <button
-            onClick={handleCopyResult}
-            style={{
-              padding: '0.5rem 1rem',
-              backgroundColor: colors.button,
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '0.875rem',
-            }}
-          >
-            コピー
-          </button>
-          <button
-            onClick={handleShareURL}
-            style={{
-              padding: '0.5rem 1rem',
-              backgroundColor: colors.button,
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '0.875rem',
-            }}
-          >
-            共有
-          </button>
-        </div>
+        <button
+          onClick={handleShareURL}
+          style={{
+            padding: '0.5rem 1rem',
+            backgroundColor: colors.button,
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontSize: '0.875rem',
+          }}
+        >
+          共有
+        </button>
         <button
           onClick={() => setShowKeyboardHelp(!showKeyboardHelp)}
           style={{
@@ -575,7 +486,7 @@ export default function UnitConverter() {
           }}
         >
           {selectedCategory.units
-            .filter((unit) => unit.id !== toUnit.id)
+            .filter((unit) => unit.id !== fromUnit.id)
             .map((unit) => {
               const convertedValue =
                 !isNaN(numericValue) && isFinite(numericValue)
@@ -584,12 +495,28 @@ export default function UnitConverter() {
               return (
                 <div
                   key={unit.id}
+                  onClick={() => handleCopyConversion(unit, convertedValue)}
                   style={{
                     padding: '0.75rem',
                     backgroundColor: colors.bgSecondary,
                     borderRadius: '4px',
                     border: `1px solid ${colors.border}`,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
                   }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = colors.bgTertiary;
+                    e.currentTarget.style.borderColor = colors.borderAccent;
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = colors.bgSecondary;
+                    e.currentTarget.style.borderColor = colors.border;
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                  title="クリックでコピー"
                 >
                   <div style={{ fontSize: '0.75rem', color: colors.textSecondary, marginBottom: '0.25rem' }}>
                     {unit.name}
